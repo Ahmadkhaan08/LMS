@@ -12,6 +12,9 @@
     "types": ["node"],
 
     /* Output */
+    "outDir": "./dist",
+    "rootDir": "./",
+
     "sourceMap": true,
     "declaration": false,
 
@@ -26,5 +29,7 @@
 
     /* Dev experience */
     "skipLibCheck": true
-  }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
