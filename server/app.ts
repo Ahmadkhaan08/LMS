@@ -2,6 +2,7 @@ import express,{Request,Response,NextFunction} from "express"
 import cookieParser from "cookie-parser"
 import dotenv from "dotenv"
 import cors from "cors"
+import { ErrorMiddleware } from "./middleware/error"
 dotenv.config()
 export const app=express()
 
@@ -27,3 +28,6 @@ app.use((req:Request,res:Response,next:NextFunction)=>{
     err.statusCode=404
     next(err)
 })
+
+// middleware
+app.use(ErrorMiddleware)
