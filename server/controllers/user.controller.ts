@@ -8,6 +8,7 @@ import ejs from "ejs";
 import path from "path";
 import { sendMail } from "../utilis/sendMail";
 import { sendToken } from "../utilis/jwt";
+import { redis } from "../utilis/redis";
 dotenv.config();
 
 // Register User
@@ -167,6 +168,10 @@ export const logoutUser=CatchAsyncHandler(async(req:Request,res:Response,next:Ne
   try {
     res.cookie("access_token","",{maxAge:1})
     res.cookie("refresh_token","",{maxAge:1})
+
+    const userId=req.user?._id || '' 
+
+    redis.del(userId as string)
 
     res.status(200).json({
       success:true,
