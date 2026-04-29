@@ -150,3 +150,30 @@ export const getAllCourse = CatchAsyncHandler(
     }
   },
 );
+
+
+// get course content ---- for valid user
+export const getCourseByUser=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const userCourseList=req.user?.courses
+
+    const courseId=req.params.id
+
+    const courseExists=userCourseList?.find((course:any)=>course._id.toString()===courseId)
+
+    if(!courseExists){
+      return next(new ErrorHandler("You are not eligible for this course",404))
+    }
+
+    const course=await courseModel.findById(courseId)
+
+    const courseContent=course?.courseData
+
+    res.status(200).json({
+      success:true,
+      courseContent
+    })
+  } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+})
