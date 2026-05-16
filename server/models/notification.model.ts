@@ -9,6 +9,10 @@ export interface INotification extends Document {
 
 const notificationSchema = new Schema<INotification>(
   {
+    userId: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
