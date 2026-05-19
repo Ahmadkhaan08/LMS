@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CatchAsyncHandler } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utilis/ErrorHandler";
 import cloudinary from "cloudinary";
-import { createCourse } from "../services/course.service";
+import { createCourse, getAllCoursesService } from "../services/course.service";
 import courseModel from "../models/course.model";
 import ejs from "ejs";
 import { redis } from "../utilis/redis";
@@ -433,4 +433,42 @@ export const addReplyToReview=CatchAsyncHandler(async(req:Request,res:Response,n
   } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
+})
+
+
+// get all courses -- only for admin
+export const getAllCourses=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    getAllCoursesService(res)
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
+})
+
+
+// delete course -- only for admin
+export const deleteCourse=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const {id}=req.params
+
+    const user=await courseModel.findById(id)
+
+    if(!user){
+      return next(new ErrorHandler("Course not found",404))
+    }
+
+    await courseModel.findByIdAndDelete(id)
+
+    if(typeof id==="string"){
+      await redis.del(id)
+    }
+
+    res.status(200).json({
+      success:true,
+      message:"Course Deleted Successfully"
+    })
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
+
 })

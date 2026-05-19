@@ -9,7 +9,7 @@ import path from "path";
 import { sendMail } from "../utilis/sendMail";
 import { accessTokenOptions, refreshTokenOptions, sendToken } from "../utilis/jwt";
 import { redis } from "../utilis/redis";
-import { getUserById } from "../services/user.service";
+import { getAllUsersService, getUserById, updateUserRoleService } from "../services/user.service";
 import cloudinary from "cloudinary"
 dotenv.config();
 
@@ -416,4 +416,53 @@ const myCloud=await cloudinary.v2.uploader.upload(avatar,{
   } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
   }
+})
+
+
+// get all users -- only for admin
+export const getAllUsers=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    getAllUsersService(res)
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
+})
+
+
+// update user role -- only for admin
+export const updateUserRole=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const {id,role}=req.body
+    updateUserRoleService(res,id,role)
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
+})
+
+
+// delete user -- only for admin
+export const deleteUser=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const {id}=req.params
+
+    const user=await userModel.findById(id)
+
+    if(!user){
+      return next(new ErrorHandler("User not found",404))
+    }
+
+    await userModel.findByIdAndDelete(id)
+
+    if(typeof id==="string"){
+      await redis.del(id)
+    }
+
+    res.status(200).json({
+      success:true,
+      message:"User Deleted Successfully"
+    })
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
+
 })

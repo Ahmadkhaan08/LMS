@@ -4,7 +4,7 @@ import ErrorHandler from "../utilis/ErrorHandler";
 import { IOrder } from "../models/order.model";
 import userModel from "../models/user.model";
 import courseModel from "../models/course.model";
-import { newOrder } from "../services/order.service";
+import { getAllOrdersService, newOrder } from "../services/order.service";
 import { sendMail } from "../utilis/sendMail";
 import notificationModel from "../models/notification.model";
 import mongoose from "mongoose";
@@ -84,4 +84,14 @@ export const createOrder=CatchAsyncHandler(async(req:Request,res:Response,next:N
     } catch (error:any) {
         return next(new ErrorHandler(error.message,500))
     }
+})
+
+
+// get all orders -- only for admin
+export const getAllOrders=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    getAllOrdersService(res)
+  } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+  }
 })
