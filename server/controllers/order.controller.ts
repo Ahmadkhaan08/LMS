@@ -17,6 +17,10 @@ export const createOrder=CatchAsyncHandler(async(req:Request,res:Response,next:N
         if(!user){
             return next(new ErrorHandler("User not found",404))
         }
+        const userId = user._id?.toString()
+        if(!userId){
+            return next(new ErrorHandler("User not found",404))
+        }
 
         const courseExistInUser=user.courses.some((course:any)=>course.courseId.toString()===courseId)
 
@@ -36,7 +40,7 @@ export const createOrder=CatchAsyncHandler(async(req:Request,res:Response,next:N
         
         const data:any={
             courseId:course._id.toString(),
-            userId:user._id.toString(),
+            userId,
             payment_info
         }
 
@@ -66,7 +70,7 @@ export const createOrder=CatchAsyncHandler(async(req:Request,res:Response,next:N
         await user.save()
         
         await notificationModel.create({
-            userId:user._id.toString(),
+            userId,
             title:"New Order",
             message: `You've a new order from ${course.name}`,
         })

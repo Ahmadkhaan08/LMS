@@ -9,6 +9,7 @@ import { redis } from "../utilis/redis";
 import mongoose from "mongoose";
 import path from "path";
 import { sendMail } from "../utilis/sendMail";
+import notificationModel from "../models/notification.model";
 
 // upload course
 export const uploadCourse = CatchAsyncHandler(
@@ -216,6 +217,18 @@ export const addQuestion=CatchAsyncHandler(async(req:Request,res:Response,next:N
 
     // add this question to our course content
     courseContent.questions.push(newQuestion)
+
+    const userId = req.user?._id
+    if (!userId) {
+      return next(new ErrorHandler("Invalid user", 400))
+    }
+
+    // send notification to admin
+    await notificationModel.create({
+      userId: userId.toString(),
+      title:"New Question Recieved",
+      message:`You have a new question in ${courseContent.title    }`
+    })
     
     await course?.save()
 
@@ -272,7 +285,20 @@ export const addAnswer=CatchAsyncHandler(async(req:Request,res:Response,next:Nex
 
     // user validation to add notification/email sending
     if(req.user?._id===question.user._id){
-      // add a notification
+        
+    const userId = req.user?._id
+
+    if (!userId) {
+      return next(new ErrorHandler("Invalid user", 400))
+    }
+
+       // send notification to admin
+    await notificationModel.create({
+      userId: userId.toString(),
+      title:"New Question Reply Recieved",
+      message:`You have a new question reply in ${courseContent.title}`
+    })
+    
     }else{
       // send mail
 
