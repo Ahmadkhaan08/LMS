@@ -110,8 +110,7 @@ export const getSingleCourse = CatchAsyncHandler(
             "-courseData.videoUrl -courseData.suggestion -courseData.links -courseData.questions",
           );
 
-        await redis.set(courseId.toString(), JSON.stringify(course));
-
+        await redis.set(courseId.toString(), JSON.stringify(course),"EX",604800); //7 days expiry
         res.status(200).json({
           success: true,
           course,
