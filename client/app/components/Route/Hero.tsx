@@ -95,7 +95,7 @@ const Hero = () => {
           <div className="absolute w-62.5 h-62.5 lg:w-100 lg:h-100 hero_animation rounded-full opacity-10 lg:opacity-20 z-0 blur-2xl"></div>
           
           <Image
-            src={require("../../public/assets/hero-banner-1.png")}
+            src={require("../../../public/assets/hero-banner-1.png")}
             width={600}
             height={600}
             alt="Students learning online"

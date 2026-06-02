@@ -1,27 +1,23 @@
 "use client";
 import Link from "next/link";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import NavItems from "../utilis/NavItems";
 import { ThemeSwitcher } from "../utilis/ThemeSwitcher";
 import { HiOutlineMenuAlt3, HiOutlineUserCircle } from "react-icons/hi";
+import CustomModel from "../utilis/CustomModel";
+import Login from "./Auth/Login";
+import SignUp from "./Auth/SignUp";
+import Verification from "./Auth/Verification";
 
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   activeItem: number;
+  route:string;
+  setRoute:(route:string)=>void
 };
 
-const Header: FC<Props> = ({ activeItem, setOpen }) => {
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 85) {
-        setActive(true);
-      } else {
-        setActive(false);
-      }
-    });
-  }
-
+const Header: FC<Props> = ({open, activeItem, setOpen, route,setRoute }) => {
   const handleClose = (e: any) => {
     if (e.target.id === "screen") {
       {
@@ -31,6 +27,20 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
   };
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setActive(window.scrollY > 85);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="w-full relative">
       <div
@@ -91,6 +101,57 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
           </div>
         )}
       </div>
+      {
+        route==="Login" && (
+          <>
+          {
+            open && (
+              <CustomModel
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={Login}/>
+            )
+          }
+          
+          </>
+        )
+      }
+      {
+        route==="Sign-Up" && (
+          <>
+          {
+            open && (
+              <CustomModel
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={SignUp}/>
+            )
+          }
+          
+          </>
+        )
+      }
+      {
+        route==="Verification" && (
+          <>
+          {
+            open && (
+              <CustomModel
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={Verification}/>
+            )
+          }
+          
+          </>
+        )
+      }
     </div>
   );
 };

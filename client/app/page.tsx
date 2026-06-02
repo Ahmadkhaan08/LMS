@@ -2,13 +2,15 @@
 import Heading from "./utilis/Heading";
 import { useState } from "react";
 import Header from "./components/Header";
-import Hero from "./Route/Hero";
+import Hero from "./components/Route/Hero";
 
 
 
 const Page = () => {
   const [open,setOpen]=useState(false)
   const [activeItem,setActiveItem]=useState(0)
+  const [route,setRoute]=useState("Verification")
+
   return (
     <div>
        <Heading
@@ -20,7 +22,9 @@ const Page = () => {
       <Header
       open={open}
       setOpen={setOpen}
-      activeItem={activeItem}/>
+      activeItem={activeItem}
+      setRoute={setRoute}
+      route={route}/>
       <Hero/>
     </div>
   );
