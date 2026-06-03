@@ -1,11 +1,14 @@
 "use client";
+import { useRegisterMutation } from "../../../redux/features/auth/authApi";
 import { styles } from "../../styles/style";
 import { useFormik } from "formik";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import {
   AiFillGithub,
   AiOutlineEye,
   AiOutlineEyeInvisible,
+  AiOutlineLoading3Quarters,
 } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import * as Yup from "yup";
@@ -16,18 +19,38 @@ type Props = {
 
 const schema = Yup.object().shape({
   name: Yup.string().required("Please enter you name!"),
-  email: Yup.string().email("Invalid Email!").required("Please enter you email!"),
+  email: Yup.string()
+    .email("Invalid Email!")
+    .required("Please enter you email!"),
   password: Yup.string().required("Please enter your password!").min(6),
 });
 
 const SignUp: FC<Props> = ({ setRoute }) => {
   const [show, setShow] = useState(false);
+  const [register, { error, isSuccess, data, isLoading }] =
+    useRegisterMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message || "Registeration Successful";
+      toast.success(message);
+      setRoute("Verification");
+    }
+
+    if (error) {
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccess, error]);
 
   const formik = useFormik({
     initialValues: { name: "", email: "", password: "" },
     validationSchema: schema,
     onSubmit: async ({ name, email, password }) => {
-        setRoute("Verification")    
+      const data = { name, email, password };
+      await register(data);
     },
   });
 
@@ -105,7 +128,22 @@ const SignUp: FC<Props> = ({ setRoute }) => {
           <span className="text-red-500 pt-2 block">{errors.password}</span>
         )}
         <div className="w-full mt-5">
-          <input type="submit" value="Sign Up" className={`${styles.button}`} />
+          <button
+            type="submit"
+            disabled={isLoading || formik.isSubmitting}
+            className={`${styles.button} ${
+              isLoading || formik.isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+          >
+            {isLoading || formik.isSubmitting ? (
+      <>
+        <AiOutlineLoading3Quarters className="animate-spin mr-2" size={20} />
+        Signing up...
+      </>
+    ) : (
+      "Sign Up"
+    )}
+          </button>
         </div>
         <br />
         <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">

@@ -1,6 +1,10 @@
 import { VscWorkspaceTrusted } from "react-icons/vsc";
 import { styles } from "../../styles/style";
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useActivationMutation } from "../../../redux/features/auth/authApi"
+import toast from "react-hot-toast";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 type Props = {
   setRoute: (route: string) => void;
@@ -14,23 +18,52 @@ type VerifyNumber = {
 };
 
 const Verification: FC<Props> = ({ setRoute }) => {
+  const { token } = useSelector((state: any) => state.auth);
+  const [activation, { isSuccess, error,isLoading }] = useActivationMutation();
   const [invalidErrors, setInvalidErrors] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Account Activated Successfully!");
+      setRoute("Login");
+    }
+
+    if (error) {
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+        setInvalidErrors(true);
+      } else {
+        console.log("An error occured", error);
+      }
+    }
+  }, [isSuccess, error]);
+
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
   ];
+
   const [verifyNumber, setVerifyNumber] = useState<VerifyNumber>({
     "0": "",
     "1": "",
     "2": "",
     "3": "",
   });
-  
+
   const verificationHandler = async () => {
-    setInvalidErrors(true)
-};
+    const verificationNumber = Object.values(verifyNumber).join("");
+    if (verificationNumber.length !== 4) {
+      setInvalidErrors(true);
+      return;
+    }
+    await activation({
+      activation_token: token,
+      activation_code: verificationNumber,
+    });
+  };
 
   const handleInputChange = (index: number, value: string) => {
     setInvalidErrors(false);
@@ -75,8 +108,15 @@ const Verification: FC<Props> = ({ setRoute }) => {
       <br />
       <br />
       <div className="w-full flex justify-center">
-        <button className={`${styles.button}`} onClick={verificationHandler}>
-          Verify OTP
+        <button className={`${styles.button}`} onClick={verificationHandler} disabled={isLoading}>
+         {isLoading  ? (
+               <>
+                 <AiOutlineLoading3Quarters className="animate-spin mr-2" size={20} />
+                 Verifying...
+               </>
+             ) : (
+               "Verify OTP"
+             )}
         </button>
       </div>
       <br />
