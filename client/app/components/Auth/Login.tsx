@@ -1,32 +1,50 @@
 "use client";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { styles } from "../../styles/style";
 import { useFormik } from "formik";
-import React, { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { AiFillGithub, AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import * as Yup from "yup";
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
+import { signIn } from "next-auth/react";
 
 type Props = {
   setRoute: (route: string) => void;
+  setOpen: (open: boolean) => void;
 };
 
 const schema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid Email!")
-    .required("Please enter you email!"),
+  email: Yup.string().email("Invalid Email!").required("Please enter you email!"),
   password: Yup.string().required("Please enter your password!").min(6),
 });
 
-const Login: FC<Props> = ({ setRoute }) => {
+const Login: FC<Props> = ({ setRoute , setOpen}) => {
   const [show, setShow] = useState(false);
+  const [login,{isSuccess,error,isLoading}]=useLoginMutation()
 
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: schema,
     onSubmit: async ({ email, password }) => {
-      console.log(email, password);
+      await login({email, password});
     },
   });
+
+  useEffect(()=>{
+    if(isSuccess){
+      toast.success("Login Successfully!")
+      setOpen(false)
+    }
+
+    if(error){
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  },[isSuccess,error])
 
   const { errors, touched, values, handleChange, handleSubmit } = formik;
   return (
@@ -83,15 +101,30 @@ const Login: FC<Props> = ({ setRoute }) => {
             <span className="text-red-500 pt-2 block">{errors.password}</span>
           )}
         <div className="w-full mt-5">
-          <input type="submit" value="Login" className={`${styles.button}`} />
+          <button
+            type="submit"
+            disabled={isLoading || formik.isSubmitting}
+            className={`${styles.button} ${
+              isLoading || formik.isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+          >
+            {isLoading || formik.isSubmitting ? (
+      <>
+        < FaSpinner    className="animate-spin mr-2" size={20} />
+        Logging...
+      </>
+    ) : (
+      "Login"
+    )}
+          </button>
         </div>
         <br />
         <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
           or join with
         </h5>
         <div className="flex items-center justify-center my-3">
-            <FcGoogle size={30} className="cursor-pointer mr-2"/>
-            <AiFillGithub size={30} className="cursor-pointer ml-2"/>
+            <FcGoogle size={30} className="cursor-pointer mr-2" onClick={()=>signIn("google")}/>
+            <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={()=>signIn("github")}/>
         </div>
         <h5 className="text-center pt-4 font-Poppins text-[14px]">
             Not have an account?

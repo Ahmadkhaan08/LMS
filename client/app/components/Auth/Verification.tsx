@@ -1,10 +1,10 @@
 import { VscWorkspaceTrusted } from "react-icons/vsc";
 import { styles } from "../../styles/style";
-import React, { FC, useEffect, useRef, useState } from "react";
+import  { FC, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useActivationMutation } from "../../../redux/features/auth/authApi"
 import toast from "react-hot-toast";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FaSpinner } from "react-icons/fa";
 
 type Props = {
   setRoute: (route: string) => void;
@@ -111,7 +111,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
         <button className={`${styles.button}`} onClick={verificationHandler} disabled={isLoading}>
          {isLoading  ? (
                <>
-                 <AiOutlineLoading3Quarters className="animate-spin mr-2" size={20} />
+                 <FaSpinner className="animate-spin mr-2" size={20} />
                  Verifying...
                </>
              ) : (

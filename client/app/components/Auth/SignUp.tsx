@@ -8,8 +8,8 @@ import {
   AiFillGithub,
   AiOutlineEye,
   AiOutlineEyeInvisible,
-  AiOutlineLoading3Quarters,
 } from "react-icons/ai";
+import { FaSpinner } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import * as Yup from "yup";
 
@@ -137,7 +137,7 @@ const SignUp: FC<Props> = ({ setRoute }) => {
           >
             {isLoading || formik.isSubmitting ? (
       <>
-        <AiOutlineLoading3Quarters className="animate-spin mr-2" size={20} />
+        <FaSpinner className="animate-spin mr-2" size={20} />
         Signing up...
       </>
     ) : (
