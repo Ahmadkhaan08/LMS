@@ -39,4 +39,4 @@ export const apiSlice=createApi({
     })
 })
 
-export const {useRefreshTokenQuery}=apiSlice
+export const {useRefreshTokenQuery,useLoadUserQuery}=apiSlice

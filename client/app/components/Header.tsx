@@ -11,7 +11,10 @@ import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import {
+  useLogoutQuery,
+  useSocialAuthMutation,
+} from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -35,8 +38,12 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+  const [logout, setLogout] = useState(false);
 
-  console.log(data?.user?.image);
+  const {} = useLogoutQuery(undefined, {
+    skip: !logout ? true : false,
+  });
+  // console.log(data?.user?.image);
 
   useEffect(() => {
     if (!user) {
@@ -49,8 +56,13 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
       }
     }
 
-    if (isSuccess) {
-      toast.success("Login Successfully!");
+    if (data === null && isSuccess) {
+      toast.success("Welcome back to ELearning!");
+      setOpen(false);
+    }
+
+    if (data === null) {
+      setLogout(true);
     }
   }, [data, user]);
 
@@ -66,7 +78,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  console.log(user);
+  // console.log(user);
 
   return (
     <div className="w-full relative">
@@ -104,9 +116,12 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
                     <Image
                       src={user.avatar.url}
                       alt=""
-                      className="w-7.5 h-7.5 rounded-full"
+                      className={`w-7.5 h-7.5 rounded-full ${
+                        activeItem === 5 ? "border-2 border-blue-500" : "none"
+                      }`}
                       width={100}
                       height={100}
+                      // style={{border:activeItem===5?"2px solid blue":""}}
                     />
                   </Link>
                 ) : (
