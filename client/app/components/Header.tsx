@@ -10,6 +10,9 @@ import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import toast from "react-hot-toast";
 
 type Props = {
   open: boolean;
@@ -30,6 +33,26 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
+  const { data } = useSession();
+  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+
+  console.log(data?.user?.image);
+
+  useEffect(() => {
+    if (!user) {
+      if (data) {
+        socialAuth({
+          email: data?.user?.email,
+          name: data?.user?.name,
+          avatar: data?.user?.image,
+        });
+      }
+    }
+
+    if (isSuccess) {
+      toast.success("Login Successfully!");
+    }
+  }, [data, user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,13 +101,19 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
               {user ? (
                 user.avatar ? (
                   <Link href={"/profile"}>
-                    <Image src={user.avatar} alt="" />
+                    <Image
+                      src={user.avatar.url}
+                      alt=""
+                      className="w-7.5 h-7.5 rounded-full"
+                      width={100}
+                      height={100}
+                    />
                   </Link>
                 ) : (
                   <Link href={"/profile"}>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-black dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-semibold cursor-pointer">
-                    {user.name?.charAt(0).toUpperCase()}
-                  </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-black dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-semibold cursor-pointer">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </div>
                   </Link>
                 )
               ) : (
