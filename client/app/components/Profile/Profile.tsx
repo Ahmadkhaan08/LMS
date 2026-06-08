@@ -17,14 +17,21 @@ const Profile: FC<Props> = ({ user }) => {
   const [avatar, setAvatar] = useState(null);
   const [active, setActive] = useState(1);
   const [logout, setLogout] = useState(false);
-  const {} = useLogoutQuery(undefined, {
+  const { isSuccess } = useLogoutQuery(undefined, {
     skip: !logout ? true : false,
   });
 
+  useEffect(() => {
+    if (isSuccess) {
+      window.location.href = "/";
+    }
+  }, [isSuccess]);
+
   const logOutHandler = async () => {
+    await signOut({ redirect: false });
     setLogout(true);
-    await signOut();
   };
+
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
@@ -53,14 +60,12 @@ const Profile: FC<Props> = ({ user }) => {
       </div>
       {active === 1 && (
         <div className="w-full h-full bg-transparent mt-[80px]">
-          <ProfileInfo
-          user={user}
-          avatar={avatar} />{" "}
+          <ProfileInfo user={user} avatar={avatar} />{" "}
         </div>
       )}
       {active === 2 && (
         <div className="w-full h-full bg-transparent mt-[80px]">
-          <ChangePassword/>
+          <ChangePassword />
         </div>
       )}
     </div>

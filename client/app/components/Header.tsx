@@ -36,7 +36,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
-  const { data } = useSession();
+  const { data, status } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const [logout, setLogout] = useState(false);
 
@@ -47,7 +47,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
 
   useEffect(() => {
     if (!user) {
-      if (data) {
+      if (status === "authenticated" && data) {
         socialAuth({
           email: data?.user?.email,
           name: data?.user?.name,
@@ -60,7 +60,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
       toast.success("Welcome back to ELearning!");
       setOpen(false);
     }
-  }, [data, user]);
+  }, [data, user, status]);
 
   useEffect(() => {
     const handleScroll = () => {

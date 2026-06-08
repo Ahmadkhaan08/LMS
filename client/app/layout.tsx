@@ -6,7 +6,10 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./Provider";
 import { SessionProvider } from "next-auth/react";
-import { useLoadUserQuery, useRefreshTokenQuery } from "@/redux/features/api/apiSlice";
+import {
+  useLoadUserQuery,
+  useRefreshTokenQuery,
+} from "@/redux/features/api/apiSlice";
 import Loader from "./components/Loader/Loader";
 import { FC, useState } from "react";
 
@@ -35,9 +38,7 @@ export default function RootLayout({
         <Providers>
           <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <Custom>
-              {children}
-              </Custom>
+              <Custom>{children}</Custom>
               <Toaster position="top-center" reverseOrder={false} />
             </ThemeProvider>
           </SessionProvider>
