@@ -26,7 +26,7 @@ export const authApi = apiSlice.injectEndpoints({
               token: result.data.activationToken,
             }),
           );
-        } catch (error: any) {
+        } catch (error) {
           console.log(error);
         }
       },
@@ -43,70 +43,78 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
     // login
-    login:builder.mutation({
-      query:({email,password})=>({
-        url:"login",
-        method:"POST",
-        body:{
+    login: builder.mutation({
+      query: ({ email, password }) => ({
+        url: "login",
+        method: "POST",
+        body: {
           email,
-          password
-        }
+          password,
+        },
+        credentials:"include" as const 
       }),
-      async onQueryStarted(arg,{queryFulfilled,dispatch}){
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled
+          const result = await queryFulfilled;
           dispatch(
             userLoggedIn({
-              accessToken:result.data.accessToken,
-              user:result.data.user
-            })
-          )
-        } catch (error:any) {
-          console.log(error)
+              accessToken: result.data.accessToken,
+              user: result.data.user,
+            }),
+          );
+        } catch (error) {
+          console.log(error);
         }
-      }
+      },
     }),
     // social auth
-    socialAuth:builder.mutation({
-      query:({email,name,avatar})=>({
-        url:"social-auth",
-        method:"POST",
-        body:{
+    socialAuth: builder.mutation({
+      query: ({ email, name, avatar }) => ({
+        url: "social-auth",
+        method: "POST",
+        body: {
           email,
           name,
-          avatar
-        }
+          avatar,
+        },
+        credentials:"include" as const 
       }),
-      async onQueryStarted(arg,{queryFulfilled,dispatch}){
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled
+          const result = await queryFulfilled;
           dispatch(
             userLoggedIn({
-              accessToken:result.data.accessToken,
-              user:result.data.user
-            })
-          )
-        } catch (error:any) {
-          console.log(error)
+              accessToken: result.data.accessToken,
+              user: result.data.user,
+            }),
+          );
+        } catch (error) {
+          console.log(error);
         }
-      }
+      },
     }),
     // logout
-    logout:builder.query({
-      query:()=>({
-        url:"logout",
-        method:"GET",
-        credentials:"include" as const
+    logout: builder.query({
+      query: () => ({
+        url: "logout",
+        method: "GET",
+        credentials: "include" as const,
       }),
-      async onQueryStarted(arg,{dispatch}){
+      async onQueryStarted(arg, { dispatch }) {
         try {
-          dispatch(userLoggedOut())
-        } catch (error:any) {
-          console.log(error)
+          dispatch(userLoggedOut());
+        } catch (error) {
+          console.log(error);
         }
-      }
-    })
+      },
+    }),
   }),
 });
 
-export const { useRegisterMutation, useActivationMutation, useLoginMutation, useSocialAuthMutation,useLogoutQuery } = authApi;
+export const {
+  useRegisterMutation,
+  useActivationMutation,
+  useLoginMutation,
+  useSocialAuthMutation,
+  useLogoutQuery,
+} = authApi;

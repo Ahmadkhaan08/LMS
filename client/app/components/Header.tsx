@@ -60,10 +60,6 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
       toast.success("Welcome back to ELearning!");
       setOpen(false);
     }
-
-    if (data === null) {
-      setLogout(true);
-    }
   }, [data, user]);
 
   useEffect(() => {

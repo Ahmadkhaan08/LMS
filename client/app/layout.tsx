@@ -6,9 +6,9 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./Provider";
 import { SessionProvider } from "next-auth/react";
-import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import { useLoadUserQuery, useRefreshTokenQuery } from "@/redux/features/api/apiSlice";
 import Loader from "./components/Loader/Loader";
-import { FC } from "react";
+import { FC, useState } from "react";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -48,6 +48,9 @@ export default function RootLayout({
 }
 
 const Custom: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoading } = useLoadUserQuery({});
-  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
+  // Step 1: Refresh the access token cookie first
+  const { isLoading: refreshLoading } = useRefreshTokenQuery({});
+  // Step 2: Only load user AFTER refresh completes (skip while refreshing)
+  const { isLoading } = useLoadUserQuery({}, { skip: refreshLoading });
+  return <>{refreshLoading || isLoading ? <Loader /> : <>{children}</>}</>;
 };

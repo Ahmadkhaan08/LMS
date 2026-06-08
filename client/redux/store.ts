@@ -13,14 +13,3 @@ export const store=configureStore({
     devTools:false,
     middleware:(getDefaultMiddleware)=>getDefaultMiddleware().concat(apiSlice.middleware)
 })
-
-// call the refresh token function on every reload
-const initializeApp=async()=>{
-    // refresh token
-    await store.dispatch(apiSlice.endpoints.refreshToken.initiate({},{forceRefetch:true}))
-    // load user data
-    await store.dispatch(apiSlice.endpoints.loadUser.initiate({},{forceRefetch:true}))
-
-}
-
-initializeApp()

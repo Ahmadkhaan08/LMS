@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 import ProfileInfo from "./ProfileInfo";
+import ChangePassword from "./ChangePassword";
 
 type Props = {
   user: any;
@@ -55,6 +56,11 @@ const Profile: FC<Props> = ({ user }) => {
           <ProfileInfo
           user={user}
           avatar={avatar} />{" "}
+        </div>
+      )}
+      {active === 2 && (
+        <div className="w-full h-full bg-transparent mt-[80px]">
+          <ChangePassword/>
         </div>
       )}
     </div>

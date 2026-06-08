@@ -276,7 +276,7 @@ interface IUpdateUserInfo{
 
 export const updateUserInfo=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
   try {
-    const {name,email}=req.body as IUpdateUserInfo
+    const {name}=req.body as IUpdateUserInfo
     
     const userId=req.user?._id
 
@@ -287,14 +287,14 @@ export const updateUserInfo=CatchAsyncHandler(async(req:Request,res:Response,nex
     const user=await userModel.findById(userId.toString())
 
 
-    if(email && user){
-      const isEmail=await userModel.findOne({email})
-      if(isEmail){
-      return next(new ErrorHandler("Email Already Exists", 400));
-      }else{
-        user.email=email
-      }
-    }
+    // if(email && user){
+    //   const isEmail=await userModel.findOne({email})
+    //   if(isEmail){
+    //   return next(new ErrorHandler("Email Already Exists", 400));
+    //   }else{
+    //     user.email=email
+    //   }
+    // }
 
     if(name && user){
       user.name=name
