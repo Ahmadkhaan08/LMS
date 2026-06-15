@@ -1,3 +1,4 @@
+import { styles } from "../../../../app/styles/style";
 import React, { FC } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 
@@ -14,7 +15,7 @@ const CourseOptions: FC<Props> = ({ active, setActive }) => {
     "Course Preview",
   ];
   return (
-    <div>
+    <div className={`${styles.label}`}>
       {options.map((option: any, index: number) => (
         <div key={index} className="w-full flex py-5 items-center">
           <div

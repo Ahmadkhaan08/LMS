@@ -1,11 +1,13 @@
-'use client'
+"use client";
 import Ratings from "../../../../app/utilis/Ratings";
 import { styles } from "../../../../app/styles/style";
 import CoursePlayer from "../../../../app/utilis/CoursePlayer";
-import { IoCheckmarkDoneOutline } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import React, { FC, useState } from "react";
+import { FaSpinner } from "react-icons/fa";
 
 type Props = {
+  isLoading: boolean;
   active: number;
   setActive: (active: number) => void;
   courseData: any;
@@ -13,12 +15,13 @@ type Props = {
 };
 
 const CoursePreview: FC<Props> = ({
+  isLoading,
   active,
   setActive,
   courseData,
   handleCourseCreate,
 }) => {
-  const [isEdit,setIsEdit]=useState()
+  // const [isEdit,setIsEdit]=useState()
   const discountPercentage =
     ((courseData?.estimatedPrice - courseData?.price) /
       courseData?.estimatedPrice) *
@@ -26,13 +29,13 @@ const CoursePreview: FC<Props> = ({
 
   const discountPercentagePrice = discountPercentage.toFixed(0);
 
-  const prevButton=()=>{
-    setActive(active-1)
-  }
+  const prevButton = () => {
+    setActive(active - 1);
+  };
 
-  const createCourse=()=>{
-    handleCourseCreate()
-  }
+  const createCourse = () => {
+    handleCourseCreate();
+  };
 
   return (
     <div className={`${styles.label} w-[80%] m-auto py-5 mb-5`}>
@@ -98,7 +101,7 @@ const CoursePreview: FC<Props> = ({
             What you will learn from this course?
           </h1>
         </div>
-         {courseData?.benefits?.map((item: any, index: number) => (
+        {courseData?.benefits?.map((item: any, index: number) => (
           <div className="w-full flex 800px:items-center py-2" key={index}>
             <div className="w-[15px] mr-1">
               <IoCheckmarkDoneOutline size={20} />
@@ -133,18 +136,31 @@ const CoursePreview: FC<Props> = ({
         <br />
         <br />
       </div>
-       <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-between">
         <div
           className="w-full 800px:w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 m-[20px] cursor-pointer"
           onClick={() => prevButton()}
         >
           Prev
         </div>
-        <div
-          className="w-full 800px:w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 m-[20px] cursor-pointer"
-          onClick={() => createCourse()}
-        >
-          {isEdit ? "Update" : "Create"}
+        <div className="w-full 800px:w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff]  mt-8 m-[20px] ">
+          <button
+            type="button"
+            disabled={isLoading}
+            className={`flex items-center justify-center rounded cursor-pointer${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            onClick={() => createCourse()}
+          >
+            {isLoading ? (
+              <>
+                <FaSpinner className="animate-spin mr-2" size={20} />
+                Creating...
+              </>
+            ) : (
+              "Create"
+            )}
+          </button>
         </div>
       </div>
     </div>
