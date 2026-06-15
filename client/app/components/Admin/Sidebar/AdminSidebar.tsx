@@ -156,7 +156,7 @@ const AdminSidebar = () => {
                   alt="profile-user"
                   width={100}
                   height={100}
-                  src={user.avatar ? user.avatar.url : avatar}
+                  src={user?.avatar ? user.avatar.url : avatar}
                   className="w-[80px] h-[80px] rounded-full cursor-pointer"
                   style={{
                     cursor: "pointer",

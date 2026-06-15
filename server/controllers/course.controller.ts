@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import path from "path";
 import { sendMail } from "../utilis/sendMail";
 import notificationModel from "../models/notification.model";
+import axios from "axios";
 
 // upload course
 export const uploadCourse = CatchAsyncHandler(
@@ -471,3 +472,72 @@ export const deleteCourse=CatchAsyncHandler(async(req:Request,res:Response,next:
   }
 
 })
+
+// generate video url
+// export const generateVideoUrl = CatchAsyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { videoId } = req.body;
+   
+//       const response = await axios.post(
+//         `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+//         {
+//           ttl: 300,
+//         },
+//         {
+//           headers: {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//             Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+//           },
+//         }
+//       );
+//       res.json(response.data);
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
+
+    export const generateVideoUrl = CatchAsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            let { videoId } = req.body;
+
+            if (!videoId || typeof videoId !== 'string') {
+                return next(new ErrorHandler("A valid Video ID string is required", 400));
+            }
+
+            videoId = videoId.trim();
+
+
+            const response = await axios.post(
+                `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+                {
+                    ttl: 300,
+                    // Allow playback from localhost during development
+                    ...(process.env.NODE_ENV === 'development' && {
+                        whitelisthref: 'http://localhost:3000'
+                    })
+                },
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+                    },
+                }
+            );
+
+            res.status(200).json(response.data);
+
+        } catch (error: any) {
+
+            console.error("VDOCIPHER ERROR DETAILS:", error.response?.data || error.message);
+
+            const statusCode = error.response?.status || 500;
+
+            const errorMessage = error.response?.data?.message || error.message || "Failed to generate video OTP";
+
+            return next(new ErrorHandler(errorMessage, statusCode));
+        }
+    });

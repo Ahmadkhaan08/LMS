@@ -83,13 +83,56 @@ const CourseContent: FC<Props> = ({
     }
   };
 
-  const addNewSection=()=>{}
+  const addNewSection = () => {
+    if (
+      courseContentData[courseContentData.length - 1].title === "" ||
+      courseContentData[courseContentData.length - 1].description === "" ||
+      courseContentData[courseContentData.length - 1].videoUrl === "" ||
+      courseContentData[courseContentData.length - 1].links?.[0]?.title ===
+        "" ||
+      courseContentData[courseContentData.length - 1].links?.[0]?.url === ""
+    ) {
+      toast.error("Please fill all the fields first!");
+    } else {
+      setActiveSection(activeSection + 1);
+      const newContent = {
+        videoUrl: "",
+        title: "",
+        description: "",
+        videoLength: "",
+        videoSection: `Untitled Section ${activeSection}`,
+        links: [{ title: "", url: "" }],
+      };
+      setCourseContentData([...courseContentData, newContent]);
+    }
+  };
+
+  const prevButton = () => {
+    setActive(active - 1);
+  };
+
+  const handleOptions = () => {
+    if (
+      courseContentData[courseContentData.length - 1].title === "" ||
+      courseContentData[courseContentData.length - 1].description === "" ||
+      courseContentData[courseContentData.length - 1].videoUrl === "" ||
+      courseContentData[courseContentData.length - 1].links[0].title === "" ||
+      courseContentData[courseContentData.length - 1].links[0].url === ""
+    ) {
+      toast.error("section can't be empty!");
+    } else {
+      setActive(active + 1);
+      handleCourseSubmit();
+    }
+  };
+
   return (
     <div className="w-[80%] m-auto mt-24 p-3">
       <form onSubmit={handleSubmit}>
         {courseContentData.map((item: any, index: number) => {
           const showSectionInput =
-            index === 0 || courseContentData[index - 1].videoSection;
+            index === 0 ||
+            item.videoSection !== courseContentData[index - 1].videoSection;
 
           return (
             <div
@@ -287,7 +330,10 @@ const CourseContent: FC<Props> = ({
                 <br />
                 {index === courseContentData.length - 1 && (
                   <div>
-                    <p onClick={() => newContentHandler(item)} className="flex items-center text-[18px] dark:text-white text-black cursor-pointer">
+                    <p
+                      onClick={() => newContentHandler(item)}
+                      className="flex items-center text-[18px] dark:text-white text-black cursor-pointer font-Poppins"
+                    >
                       <AiOutlinePlusCircle className="mr-2" /> Add New Content
                     </p>
                   </div>
@@ -297,13 +343,31 @@ const CourseContent: FC<Props> = ({
           );
         })}
         <br />
-                <div
-                    className="flex items-center text-[20px] dark:text-white text-black cursor-pointer"
-                    onClick={() => addNewSection()}
-                >
-                    <AiOutlinePlusCircle className="mr-2" /> Add new Section
-                </div>
+        <div
+          className="flex items-center text-[20px] dark:text-white text-black cursor-pointer font-Poppins"
+          onClick={() => addNewSection()}
+        >
+          <AiOutlinePlusCircle className="mr-2" /> Add New Section
+        </div>
       </form>
+      <br />
+      <div className="w-full flex items-center justify-between">
+        <div
+          className="w-full 800px:w-45 flex items-center justify-center h-10 bg-[#37a39a] text-center text-white rounded mt-8 m-5 cursor-pointer"
+          onClick={() => prevButton()}
+        >
+          Prev
+        </div>
+        <div
+          className="w-full 800px:w-45 flex items-center justify-center h-10 bg-[#37a39a] text-center text-white rounded mt-8 m-5 cursor-pointer"
+          onClick={() => handleOptions()}
+        >
+          Next
+        </div>
+      </div>
+      <br />
+      <br />
+      <br />
     </div>
   );
 };
