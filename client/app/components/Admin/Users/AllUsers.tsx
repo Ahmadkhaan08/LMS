@@ -1,24 +1,65 @@
-'use client'
-import { Box, Button, capitalize } from "@mui/material";
+"use client";
+import { Box, Button, capitalize, Modal } from "@mui/material";
 import { useTheme } from "next-themes";
 import { format } from "timeago.js";
 import { AiOutlineDelete, AiOutlineMail } from "react-icons/ai";
 import { DataGrid } from "@mui/x-data-grid";
 import Loader from "../../Loader/Loader";
-import { useGetAllUsersQuery } from "../../../../redux/features/user/userApi";
-import { FC, useState } from "react";
+import {
+  useDeleteUserMutation,
+  useGetAllUsersQuery,
+  useUpdateUserRoleMutation,
+} from "../../../../redux/features/user/userApi";
+import { FC, useEffect, useState } from "react";
 import { styles } from "../../../../app/styles/style";
-
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 
 type Props = {
-    isTeam:boolean
+  isTeam: boolean;
 };
 
-const AllUsers :FC<Props>= ({isTeam}) => {
+const AllUsers: FC<Props> = ({ isTeam }) => {
   const { theme, setTheme } = useTheme();
-  const [active,setActive]=useState(false)
-  const { isLoading, error, data } = useGetAllUsersQuery({});
+  const [active, setActive] = useState(false);
+  const [email, setEmail] = useState("");
+  const [open, setOpen] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [role, setRole] = useState("admin");
+  const { isLoading, error, data, refetch } = useGetAllUsersQuery(
+    {},
+    { refetchOnMountOrArgChange: true },
+  );
+  const [deleteUser, { isSuccess: deleteSuccess, error: deleteError }] =
+    useDeleteUserMutation({});
+  const [updateUserRole, { isSuccess, error: updateError }] =
+    useUpdateUserRoleMutation();
 
+  useEffect(() => {
+    if (updateError) {
+      if ("data" in updateError) {
+        const errorMessage = updateError as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+
+    if (isSuccess) {
+      toast.success("User role updated successfully");
+      setActive(false);
+      refetch();
+    }
+    if (deleteSuccess) {
+      refetch();
+      toast.success("Delete user successfully!");
+      setOpen(false);
+    }
+    if (deleteError) {
+      if ("data" in deleteError) {
+        const errorMessage = deleteError as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+  }, [deleteError, deleteSuccess, updateError, isSuccess, refetch]);
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
     { field: "name", headerName: "Name", flex: 0.5 },
@@ -34,6 +75,10 @@ const AllUsers :FC<Props>= ({isTeam}) => {
         return (
           <>
             <Button
+              onClick={() => {
+                setOpen(!open);
+                setUserId(params.row.id);
+              }}
             >
               <AiOutlineDelete
                 className="dark:text-white text-black"
@@ -65,52 +110,59 @@ const AllUsers :FC<Props>= ({isTeam}) => {
 
   const rows: any = [];
 
-  if(isTeam){
-    const newData=data && data.users.filter((item:any)=>item.role==="admin")
+  if (isTeam) {
+    const newData =
+      data && data.users.filter((item: any) => item.role === "admin");
     if (newData) {
-    newData.forEach((item: any) => {
-      rows.push({
-        id: item._id,
-        name: item.name,
-        email: item.email,
-        role: capitalize(item.role),
-        courses: item.courses.length,
-        created_at: format(item.createdAt),
+      newData.forEach((item: any) => {
+        rows.push({
+          id: item._id,
+          name: item.name,
+          email: item.email,
+          role: capitalize(item.role),
+          courses: item.courses.length,
+          created_at: format(item.createdAt),
+        });
       });
-    });
+    }
+  } else {
+    if (data) {
+      data.users.forEach((item: any) => {
+        rows.push({
+          id: item._id,
+          name: item.name,
+          email: item.email,
+          role: capitalize(item.role),
+          courses: item.courses.length,
+          created_at: format(item.createdAt),
+        });
+      });
+    }
   }
-  }else{
+  const handleSubmit = async () => {
+    await updateUserRole({ email, role });
+  };
 
-      if (data) {
-          data.users.forEach((item: any) => {
-      rows.push({
-        id: item._id,
-        name: item.name,
-        email: item.email,
-        role: capitalize(item.role),
-        courses: item.courses.length,
-        created_at: format(item.createdAt),
-    });
-});
-}
-}
-
+  const handleDelete = async () => {
+    const id = userId;
+    await deleteUser(id);
+  };
   return (
     <div className=" mt-30">
       {isLoading ? (
         <Loader />
       ) : (
         <Box sx={{ m: "20px" }}>
-            {isTeam && (
-                        <div className="w-full flex justify-end">
-                            <div
-                                className={`${styles.button} !w-[200px] !rounded-[10px] dark:bg-[#57c7a3] !h-[35px] dark:border dark:border-[#ffffff6c]`}
-                                onClick={() => setActive(!active)}
-                            >
-                                Add New Member
-                            </div>
-                        </div>
-                    )}
+          {isTeam && (
+            <div className="w-full flex justify-end">
+              <div
+                className={`${styles.button} !w-[200px] !rounded-[10px] dark:bg-[#57c7a3] !h-[35px] dark:border dark:border-[#ffffff6c]`}
+                onClick={() => setActive(!active)}
+              >
+                Add New Member
+              </div>
+            </div>
+          )}
           <Box
             sx={{
               m: "40px 0 0 0",
@@ -198,6 +250,101 @@ const AllUsers :FC<Props>= ({isTeam}) => {
           >
             <DataGrid checkboxSelection rows={rows} columns={columns} />
           </Box>
+          {active && (
+            <Modal
+              open={active}
+              onClose={() => setActive(!active)}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
+                <h1 className={`${styles.title}`}>Add New Member</h1>
+                <div className="mt-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter email..."
+                    className={`${styles.input}`}
+                  />
+                  <select
+                    name=""
+                    id=""
+                    className={`${styles.input} !mt-6 text-black`}
+                    onChange={(e: any) => setRole(e.target.value)}
+                  >
+                    <option value="admin" className="text-black">
+                      Admin
+                    </option>
+                    <option className="text-black" value="user">
+                      User
+                    </option>
+                  </select>
+                  <br />
+                  <div>
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      className={`${styles.button} my-6 !h-[30px] ${
+                        isLoading ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                      onClick={handleSubmit}
+                    >
+                      {isLoading ? (
+                        <>
+                          <FaSpinner className="animate-spin mr-2" size={20} />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </Box>
+            </Modal>
+          )}
+          {open && (
+            <Modal
+              open={open}
+              onClose={() => setOpen(!open)}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
+                <h1 className={`${styles.title}`}>
+                  Are you sure you want to delete this user?
+                </h1>
+                <div className="flex w-full items-center justify-between mb-6 mt-4">
+                  <div
+                    className={`${styles.button} !w-[120px] h-[30px] bg-[#57c7a3]!`}
+                    onClick={() => setOpen(!open)}
+                  >
+                    Cancel
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      className={`${styles.button} bg-[#d63f3f]! ${
+                        isLoading ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                      onClick={handleDelete}
+                    >
+                      {isLoading ? (
+                        <>
+                          <FaSpinner className="animate-spin mr-2" size={20} />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </Box>
+            </Modal>
+          )}
         </Box>
       )}
     </div>

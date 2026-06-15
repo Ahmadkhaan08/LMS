@@ -435,8 +435,8 @@ export const getAllUsers=CatchAsyncHandler(async(req:Request,res:Response,next:N
 // update user role -- only for admin
 export const updateUserRole=CatchAsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
   try {
-    const {id,role}=req.body
-    updateUserRoleService(res,id,role)
+    const {email,role}=req.body
+    updateUserRoleService(res,email,role)
   } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
   }
