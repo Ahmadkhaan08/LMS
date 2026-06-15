@@ -18,7 +18,7 @@ const CreateCourse = (props: Props) => {
   useEffect(()=>{
     if(isSuccess){
       toast.success("Course Created Successfully!")
-      redirect("/admin/all-courses")
+      redirect("/admin/courses")
     }
 
     if(error){
@@ -28,7 +28,7 @@ const CreateCourse = (props: Props) => {
       }
     }
   },[isLoading,isSuccess,error])
-  const [active, setActive] = useState(3);
+  const [active, setActive] = useState(0);
   const [courseInfo, setCourseInfo] = useState({
     name: "",
     description: "",
