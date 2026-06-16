@@ -12,6 +12,7 @@ type Props = {
   setActive: (active: number) => void;
   courseData: any;
   handleCourseCreate: any;
+  isEdit?: boolean;
 };
 
 const CoursePreview: FC<Props> = ({
@@ -20,8 +21,9 @@ const CoursePreview: FC<Props> = ({
   setActive,
   courseData,
   handleCourseCreate,
+  isEdit,
 }) => {
-  // const [isEdit,setIsEdit]=useState()
+  console.log(isEdit)
   const discountPercentage =
     ((courseData?.estimatedPrice - courseData?.price) /
       courseData?.estimatedPrice) *
@@ -155,10 +157,10 @@ const CoursePreview: FC<Props> = ({
             {isLoading ? (
               <>
                 <FaSpinner className="animate-spin mr-2" size={20} />
-                Creating...
+                {isEdit ? "Updating..." : " Creating..."}
               </>
             ) : (
-              "Create"
+              <>{isEdit ? "Update" : "Create"}</>
             )}
           </button>
         </div>

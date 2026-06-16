@@ -48,15 +48,20 @@ export const editCourse = CatchAsyncHandler(
     try {
       const data = req.body;
 
+      const thumbnail = data.thumbnail;
+
+      const courseId = req.params.id;
+
+      const courseData=await courseModel.findById(courseId) as any
+
       if (!data) {
         return next(new ErrorHandler("Course data is required", 400));
       }
 
-      const thumbnail = data.thumbnail;
 
-      if (thumbnail) {
+      if (thumbnail && !thumbnail.startsWith("https")) {
         // delete previous thumbnail
-        await cloudinary.v2.uploader.destroy(thumbnail.public_id);
+        await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
         // then uoload new thumnail
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
           folder: "courses/thumbnail",
@@ -68,7 +73,12 @@ export const editCourse = CatchAsyncHandler(
         };
       }
 
-      const courseId = req.params.id;
+      if(thumbnail.startsWith("https")){
+        data.thumbnail = {
+          public_id: courseData?.thumbnail.public_id,
+          url: courseData?.thumbnail.url,
+        };
+      }
 
       const course = await courseModel.findByIdAndUpdate(
         courseId,
@@ -464,7 +474,7 @@ export const addReplyToReview = CatchAsyncHandler(
 );
 
 // get all courses -- only for admin
-export const getAllCourses = CatchAsyncHandler(
+export const getAdminAllCourses = CatchAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       getAllCoursesService(res);

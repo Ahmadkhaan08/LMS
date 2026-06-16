@@ -326,7 +326,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                     <button
                       type="button"
                       disabled={isLoading}
-                      className={`${styles.button} bg-[#d63f3f]! ${
+                      className={`${styles.button} !w-[120px] h-[30px] bg-[#d63f3f]! ${
                         isLoading ? "opacity-70 cursor-not-allowed" : ""
                       }`}
                       onClick={handleDelete}

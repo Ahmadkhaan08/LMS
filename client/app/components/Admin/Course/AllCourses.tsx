@@ -1,19 +1,32 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Modal } from "@mui/material";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { format } from "timeago.js";
 import { FiEdit2 } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
 import { DataGrid } from "@mui/x-data-grid";
-import { useGetAllCoursesQuery } from "../../../../redux/features/courses/coursesApi";
+import {
+  useDeleteCourseMutation,
+  useGetAllCoursesQuery,
+} from "../../../../redux/features/courses/coursesApi";
 import Loader from "../../Loader/Loader";
+import { styles } from "../../../../app/styles/style";
+import { FaSpinner } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 type Props = {};
 
 const AllCourses = (props: Props) => {
   const { theme, setTheme } = useTheme();
-  const { isLoading, error, data } = useGetAllCoursesQuery({});
+  const [open, setOpen] = useState(false);
+  const [courseId, setCourseId] = useState("");
+  const { isLoading, data, refetch } = useGetAllCoursesQuery(
+    {},
+    { refetchOnMountOrArgChange: true },
+  );
+  const [deleteCourse, { isLoading: deleteLoading, isSuccess, error }] =
+    useDeleteCourseMutation({});
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
@@ -44,7 +57,12 @@ const AllCourses = (props: Props) => {
       renderCell: (params: any) => {
         return (
           <>
-            <Button>
+            <Button
+              onClick={() => {
+                setOpen(!open);
+                setCourseId(params.row.id);
+              }}
+            >
               <AiOutlineDelete
                 className="dark:text-white text-black"
                 size={20}
@@ -68,6 +86,26 @@ const AllCourses = (props: Props) => {
       });
     });
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      setOpen(false);
+      refetch();
+      toast.success("Course Deleted Successfully!");
+    }
+
+    if (error) {
+      if ("data" in error) {
+        const errorMessage = error as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+  }, [isSuccess, error]);
+
+  const handleDelete = async () => {
+    const id = courseId;
+    await deleteCourse(id);
+  };
 
   return (
     <div className=" mt-30">
@@ -162,6 +200,49 @@ const AllCourses = (props: Props) => {
           >
             <DataGrid checkboxSelection rows={rows} columns={columns} />
           </Box>
+          {open && (
+            <Modal
+              open={open}
+              onClose={() => setOpen(!open)}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
+                <h1 className={`${styles.title}`}>
+                  Are you sure you want to delete this user?
+                </h1>
+                <div className="flex w-full items-center justify-between mb-6 mt-4">
+                  <div
+                    className={`${styles.button} !w-[120px] h-[30px] bg-[#57c7a3]!`}
+                    onClick={() => setOpen(!open)}
+                  >
+                    Cancel
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      disabled={deleteLoading}
+                      className={`${
+                        styles.button
+                      } !w-[120px] h-[30px] bg-[#d63f3f]! ${
+                        deleteLoading ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                      onClick={handleDelete}
+                    >
+                      {deleteLoading ? (
+                        <>
+                          <FaSpinner className="animate-spin mr-2" size={20} />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </Box>
+            </Modal>
+          )}
         </Box>
       )}
     </div>

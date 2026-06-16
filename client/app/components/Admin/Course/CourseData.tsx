@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 type Props = {
   benefits: { title: string }[];
   setBenefits: (benefits: { title: string }[]) => void;
-  prerequisities: { title: string }[];
-  setPrerequisities: (prerequisities: { title: string }[]) => void;
+  prerequisites: { title: string }[];
+  setPrerequisites: (prerequisites: { title: string }[]) => void;
   active: number;
   setActive: (active: number) => void;
 };
@@ -15,8 +15,8 @@ type Props = {
 const CourseData: FC<Props> = ({
   benefits,
   setBenefits,
-  prerequisities,
-  setPrerequisities,
+  prerequisites,
+  setPrerequisites,
   active,
   setActive,
 }) => {
@@ -30,14 +30,14 @@ const CourseData: FC<Props> = ({
     setBenefits([...benefits, { title: "" }]);
   };
 
-  const handlePrerequisitiesChange = (index: number, value: any) => {
-    const updatedPrerequisities = [...prerequisities];
-    updatedPrerequisities[index].title = value;
-    setPrerequisities(updatedPrerequisities);
+  const handlePrerequisitesChange = (index: number, value: any) => {
+    const updatedPrerequisites = [...prerequisites];
+    updatedPrerequisites[index].title = value;
+    setPrerequisites(updatedPrerequisites);
   };
 
-  const handleAddPrerequisities = () => {
-    setPrerequisities([...prerequisities, { title: "" }]);
+  const handleAddPrerequisites = () => {
+    setPrerequisites([...prerequisites, { title: "" }]);
   };
 
   const prevButton=()=>{
@@ -45,7 +45,7 @@ const CourseData: FC<Props> = ({
   }
 
   const handleOptions=()=>{
-    if(benefits[benefits.length-1]?.title!=="" && prerequisities[prerequisities.length-1]?.title!==""){
+    if(benefits[benefits.length-1]?.title!=="" && prerequisites[prerequisites.length-1]?.title!==""){
         setActive(active+1)
     }else{
         toast.error("Please fill all the fields for go to next!")
@@ -82,7 +82,7 @@ const CourseData: FC<Props> = ({
           What are the prerequisites for starting this course?
         </label>
         <br />
-        {prerequisities.map((prerequisities: any, index: number) => (
+        {prerequisites.map((prerequisites: any, index: number) => (
           <input
             type="text"
             key={index}
@@ -90,13 +90,13 @@ const CourseData: FC<Props> = ({
             placeholder="You need basic knowledge of MERN stack"
             required
             className={`${styles.input} my-2`}
-            value={prerequisities?.title}
-            onChange={(e) => handlePrerequisitiesChange(index, e.target.value)}
+            value={prerequisites?.title}
+            onChange={(e) => handlePrerequisitesChange(index, e.target.value)}
           />
         ))}
         <AiOutlinePlusCircle
           style={{ margin: "10px 0px", cursor: "pointer", width: "30px" }}
-          onClick={handleAddPrerequisities}
+          onClick={handleAddPrerequisites}
           className="dark:text-white text-black"
         />
       </div>
