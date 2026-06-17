@@ -1,11 +1,10 @@
 "use client";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { styles } from "../../../../app/styles/style";
 import { BiSolidPencil } from "react-icons/bi";
 import { FaLink } from "react-icons/fa";
-import { title } from "process";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -183,7 +182,7 @@ const CourseContent: FC<Props> = ({
 
                 <div className="flex items-center">
                   <AiOutlineDelete
-                    className={`dark:text-white text-[20px] mr-2 text-black ${
+                    className={` text-[20px] mr-2 text-red-500! ${
                       index > 0 ? "cursor-pointer" : "cursor-no-drop"
                     }`}
                     onClick={() => {
@@ -280,7 +279,7 @@ const CourseContent: FC<Props> = ({
                                 linkIndex === 0
                                   ? "cursor-no-drop"
                                   : "cursor-pointer"
-                              } text-black dark:text-white text-[20px]`}
+                              } text-red-500!  text-[20px]`}
                               onClick={() =>
                                 linkIndex === 0
                                   ? null
