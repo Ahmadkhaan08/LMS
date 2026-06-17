@@ -101,3 +101,33 @@ body {
     transform: translateX(0);
   }
 }
+
+/* mui settings */
+.dark .MuiDataGrid-root {
+  border: none !important;
+  color: white !important;
+}
+
+.dark .MuiDataGrid-columnHeaders {
+  background-color: #111C43 !important;
+  border-bottom: 1px solid #ffffff20 !important;
+  color: white !important;
+}
+
+.dark .MuiDataGrid-cell {
+  border-bottom: 1px solid #ffffff15 !important;
+}
+
+.dark .MuiDataGrid-footerContainer {
+  background-color: #111C43 !important;
+  border-top: 1px solid #ffffff20 !important;
+  color: white !important;
+}
+
+.dark .MuiTablePagination-root {
+  color: white !important;
+}
+
+.dark .MuiDataGrid-iconSeparator {
+  display: none !important;
+}

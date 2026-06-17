@@ -1,12 +1,13 @@
 "use client";
-import Heading from "../utilis/Heading";
-import AdminSidebar from "../components/Admin/Sidebar/AdminSidebar";
-import AdminProtected from "../hooks/AdminProtected";
-import DashboardHero from "../components/Admin/DashboardHero";
+import Heading from "../../utilis/Heading";
+import AdminSidebar from "../../components/Admin/Sidebar/AdminSidebar";
+import AdminProtected from "../../hooks/AdminProtected";
+import DashboardHero from "../../components/Admin/DashboardHero";
+import OrdersAnalytics from "../../../app/components/Admin/Analytics/OrdersAnalytics";
 
 type Props = {};
 
-const Adminpage = (props: Props) => {
+const page = (props: Props) => {
   return (
     <div>
       <AdminProtected>
@@ -19,8 +20,9 @@ const Adminpage = (props: Props) => {
           <div className="1500px:w-[16%] w-1/5">
             <AdminSidebar />
           </div>
-          <div className="w-[85%]">
-            <DashboardHero isDashboard={true}/>
+          <div className="w-[85%] min-h-screen">
+            <DashboardHero />
+            <OrdersAnalytics/>
           </div>
         </div>
       </AdminProtected>
@@ -28,4 +30,4 @@ const Adminpage = (props: Props) => {
   );
 };
 
-export default Adminpage;
+export default page;
