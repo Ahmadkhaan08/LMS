@@ -13,21 +13,22 @@ import { redirect } from "next/navigation";
 type Props = {};
 
 const CreateCourse = (props: Props) => {
-  const [createCourse,{isLoading,error,isSuccess}]=useCreateCourseMutation()
+  const [createCourse, { isLoading, error, isSuccess }] =
+    useCreateCourseMutation();
 
-  useEffect(()=>{
-    if(isSuccess){
-      toast.success("Course Created Successfully!")
-      redirect("/admin/courses")
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Course Created Successfully!");
+      redirect("/admin/courses");
     }
 
-    if(error){
-      if("data" in error){
-        const errorMessage=error as any
-        toast.error(errorMessage.data.message)
+    if (error) {
+      if ("data" in error) {
+        const errorMessage = error as any;
+        toast.error(errorMessage.data.message);
       }
     }
-  },[isLoading,isSuccess,error])
+  }, [isLoading, isSuccess, error]);
   const [active, setActive] = useState(0);
   const [courseInfo, setCourseInfo] = useState({
     name: "",
@@ -36,9 +37,11 @@ const CreateCourse = (props: Props) => {
     estimatedPrice: "",
     tags: "",
     level: "",
+    categories: "",
     demoUrl: "",
     thumbnail: "",
   });
+  // console.log(courseInfo)
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
   const [courseContentData, setCourseContentData] = useState([
@@ -58,6 +61,7 @@ const CreateCourse = (props: Props) => {
     },
   ]);
   const [courseData, setCourseData] = useState({});
+  console.log(courseData);
 
   const handleSubmit = async () => {
     // format benefit array
@@ -74,6 +78,7 @@ const CreateCourse = (props: Props) => {
         videoUrl: CourseContent.videoUrl,
         title: CourseContent.title,
         description: CourseContent.description,
+        videoLength: CourseContent.videoLength,
         videoSection: CourseContent.videoSection,
         links: CourseContent.links.map((link) => ({
           title: link.title,
@@ -106,8 +111,8 @@ const CreateCourse = (props: Props) => {
   const handleCourseCreate = async (e: any) => {
     const data = courseData;
 
-    if(!isLoading){
-      await createCourse(data)
+    if (!isLoading) {
+      await createCourse(data);
     }
   };
   return (
@@ -142,7 +147,7 @@ const CreateCourse = (props: Props) => {
         )}
         {active === 3 && (
           <CoursePreview
-          isLoading={isLoading}
+            isLoading={isLoading}
             active={active}
             setActive={setActive}
             courseData={courseData}

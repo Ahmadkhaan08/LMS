@@ -1,6 +1,7 @@
 "use client";
+import { useGetLayoutDataQuery } from "../../../../redux/features/layout/layoutApi";
 import { styles } from "../../../../app/styles/style";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 type Props = {
   courseInfo: any;
@@ -16,6 +17,14 @@ const CourseInformation: FC<Props> = ({
   setActive,
 }) => {
   const [dragging, setDragging] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const { data } = useGetLayoutDataQuery("Categories", {});
+
+  useEffect(() => {
+    if (data) {
+      setCategories(data.layout.categories);
+    }
+  }, [data]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -126,8 +135,8 @@ const CourseInformation: FC<Props> = ({
           </div>
         </div>
         <br />
-        <div className="w-full ">
-          <div className="">
+        <div className="w-full flex justify-between">
+          <div className="w-[45%]">
             <label className={`${styles.label}`} htmlFor="email">
               Course Tags
             </label>
@@ -144,6 +153,34 @@ const CourseInformation: FC<Props> = ({
               className={`
             ${styles.input}`}
             />
+          </div>
+          <div className="w-[50%]">
+            <label className={`${styles.label} w-[50%]`}>
+              Course Categories
+            </label>
+            <select
+              name=""
+              id=""
+              className="w-full text-black dark:text-white bg-transparent border rounded h-[40px] px-2 outline-none mt-[10px] font-Poppins"
+              value={courseInfo.categories}
+              onChange={(e: any) =>
+                setCourseInfo({ ...courseInfo, categories: e.target.value })
+              }
+            >
+              <option className="dark:bg-[#1c2024] bg-blue-200" value="">
+                Select Category
+              </option>
+              {categories &&
+                categories?.map((item: any) => (
+                  <option
+                    className="dark:bg-[#1c2024] bg-blue-200"
+                    value={item.title}
+                    key={item._id}
+                  >
+                    {item.title}
+                  </option>
+                ))}
+            </select>
           </div>
         </div>
         <br />
