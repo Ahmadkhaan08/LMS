@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetLayoutDataQuery } from "../../../redux/features/layout/layoutApi";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { BiSearch } from "react-icons/bi";
 const Hero = () => {
   const [search, setSearch] = useState("");
   const router = useRouter();
+  const {data}=useGetLayoutDataQuery("Banner",{})
 
   const handleSearch = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
@@ -19,24 +21,20 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-300">
+    <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-300 font-Poppins">
       <div className="absolute top-[10%] lg:top-[15%] lg:left-[5%] w-75 h-75 lg:w-125 lg:h-125 hero_animation rounded-full opacity-20 lg:opacity-30 pointer-events-none z-0 blur-3xl"></div>
 
       <div className="container mx-auto px-4 lg:px-8 py-16 lg:py-0 relative z-10 flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
         {/* Left Side: Hero Content Section */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
           {/* Main headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
-            Unlock Your Potential with{" "}
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-              Expert-Led Courses
-            </span>
+          <h1 className="text-4xl mt-8 md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
+            {data?.layout?.banner?.title}{" "}
           </h1>
 
           {/* Subtitle or description */}
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-xl leading-relaxed">
-            Discover thousands of high-quality courses. Learn at your own pace
-            and build the skills you need for the career you want.
+          <p className="text-lg md:text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-xl leading-relaxed">
+            {data?.layout?.banner?.subTitle}
           </p>
 
           {/* Search form */}
@@ -76,7 +74,8 @@ const Hero = () => {
                 />
               ))}
             </div>
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+            <div className="mt-3">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
               Join{" "}
               <span className="font-bold text-gray-900 dark:text-white">
                 500K+
@@ -89,6 +88,7 @@ const Hero = () => {
                 Explore Courses &rarr;
               </Link>
             </p>
+            </div>
           </div>
         </div>
 
@@ -98,9 +98,9 @@ const Hero = () => {
           <div className="absolute w-62.5 h-62.5 lg:w-100 lg:h-100 hero_animation rounded-full opacity-10 lg:opacity-20 z-0 blur-2xl"></div>
 
           <Image
-            src={require("../../../public/assets/hero-banner-1.png")}
-            width={600}
-            height={600}
+            src={data?.layout?.banner?.image.url || require("../../../public/assets/hero-banner-1.png")}
+            width={400}
+            height={400}
             alt="Students learning online"
             className="object-contain w-full max-w-75 sm:max-w-100 lg:max-w-137.5 h-auto z-10 drop-shadow-2xl hover:-translate-y-2 transition-transform duration-500 ease-in-out"
             priority

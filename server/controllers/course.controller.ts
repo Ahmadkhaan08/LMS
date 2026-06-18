@@ -50,14 +50,13 @@ export const editCourse = CatchAsyncHandler(
 
       const thumbnail = data.thumbnail;
 
-      const courseId = req.params.id;
+      const courseId = req.params.id as string;
 
-      const courseData=await courseModel.findById(courseId) as any
+      const courseData = (await courseModel.findById(courseId)) as any;
 
       if (!data) {
         return next(new ErrorHandler("Course data is required", 400));
       }
-
 
       if (thumbnail && !thumbnail.startsWith("https")) {
         // delete previous thumbnail
@@ -73,7 +72,7 @@ export const editCourse = CatchAsyncHandler(
         };
       }
 
-      if(thumbnail.startsWith("https")){
+      if (thumbnail.startsWith("https")) {
         data.thumbnail = {
           public_id: courseData?.thumbnail.public_id,
           url: courseData?.thumbnail.url,
@@ -86,6 +85,11 @@ export const editCourse = CatchAsyncHandler(
         { new: true },
       );
 
+      // Update the Redis cache with the new course data
+      if (course) {
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+      }
+      
       res.status(201).json({
         success: true,
         course,

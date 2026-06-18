@@ -3,6 +3,10 @@ import Heading from "./utilis/Heading";
 import { useState } from "react";
 import Header from "./components/Header";
 import Hero from "./components/Route/Hero";
+import Courses from "./components/Route/Courses";
+import Reviews from "./components/Route/Reviews";
+import Faq from "./components/FAQ/FAQ";
+import Footer from "./components/Footer";
 
 
 
@@ -26,6 +30,10 @@ const Page = () => {
       setRoute={setRoute}
       route={route}/>
       <Hero/>
+      <Courses/>
+      <Reviews/>
+      <Faq/>
+      <Footer/>
     </div>
   );
 };
