@@ -36,7 +36,7 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
     navItemsData.map((item, index) => (
       <Link href={`${item.url}`} key={index} passHref>
         <span
-          className={`text-[18px] px-6 py-2 rounded-full font-Poppins font-medium transition-all duration-300 ${
+          className={`text-[18px] px-6 py-2 mr-2 rounded-full font-Poppins font-medium transition-all duration-300 ${
             activeItem === index
               ? "bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-md dark:shadow-none"
               : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400"

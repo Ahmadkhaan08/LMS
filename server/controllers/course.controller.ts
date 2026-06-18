@@ -87,9 +87,15 @@ export const editCourse = CatchAsyncHandler(
 
       // Update the Redis cache with the new course data
       if (course) {
-        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+        const allCourses = JSON.parse((await redis.get("allCourses")) || "[]");
+
+        const updatedCourses = allCourses.map((item: any) =>
+          item._id.toString() === courseId ? course : item,
+        );
+
+        await redis.set("allCourses", JSON.stringify(updatedCourses));
       }
-      
+
       res.status(201).json({
         success: true,
         course,

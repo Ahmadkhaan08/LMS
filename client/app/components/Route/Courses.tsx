@@ -14,7 +14,7 @@ const Courses = (props: Props) => {
       setCourses(data?.courses);
     }
   }, [data]);
-  console.log("data:", data);
+  console.log("data:", courses);
 
   return (
     <div>
