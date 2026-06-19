@@ -1,11 +1,13 @@
+"use client";
 import { styles } from "../../styles/style";
 import CoursePlayer from "../../utilis/CoursePlayer";
 import Ratings from "../../utilis/Ratings";
 import Link from "next/link";
-import { IoCheckmarkDoneOutline } from "react-icons/io5";
+import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
+import { useState } from "react";
 
 type Props = {
   data: any;
@@ -13,14 +15,18 @@ type Props = {
 
 function CourseDetails({ data }: Props) {
   const { user } = useSelector((state: any) => state.auth);
+  const [open, setOpen] = useState(false);
   const discountPercentage =
     ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
   const discountPercentagePrice = discountPercentage.toFixed(0);
   const isPurchased =
     user && user?.courses?.find((item: any) => item.courseId === data._id);
-  console.log(user);
-  console.log(data);
-  const handleOrder = () => {};
+  // console.log(user);
+  // console.log(data);
+
+  const handleOrder = () => {
+    setOpen(true);
+  };
   return (
     <div className="w-[90%] 800px:w-[90%] m-auto py-5">
       <div className="w-full flex flex-col-reverse 800px:flex-row">
@@ -205,6 +211,22 @@ function CourseDetails({ data }: Props) {
           </div>
         </div>
       </div>
+      <>
+        {open && (
+          <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center">
+            <div className="w-[500px] max-h-[90vh] overflow-y-auto  bg-white rounded-xl shadow p-3"> 
+              {/* min-h-[500px] */}
+              <div className="w-full flex justify-end">
+                <IoCloseOutline
+                  size={40}
+                  className="text-black cursor-pointer"
+                  onClick={() => setOpen(false)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     </div>
   );
 }
