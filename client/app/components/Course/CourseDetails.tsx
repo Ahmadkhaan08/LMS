@@ -8,12 +8,16 @@ import { useSelector } from "react-redux";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
 import { useState } from "react";
+import { Elements } from '@stripe/react-stripe-js'
+import CheckOutForm from "../Payment/CheckOutForm";
 
 type Props = {
   data: any;
+  stripePromise:any,
+  clientSecret:string
 };
 
-function CourseDetails({ data }: Props) {
+function CourseDetails({ data,stripePromise,clientSecret }: Props) {
   const { user } = useSelector((state: any) => state.auth);
   const [open, setOpen] = useState(false);
   const discountPercentage =
@@ -222,6 +226,16 @@ function CourseDetails({ data }: Props) {
                   className="text-black cursor-pointer"
                   onClick={() => setOpen(false)}
                 />
+              </div>
+              <div className="w-full">
+                {
+                  stripePromise && clientSecret && (
+                    <Elements stripe={stripePromise} options={{clientSecret}} >
+                      <CheckOutForm setOpen={setOpen} data={data}/>
+                    </Elements>
+
+                  )
+                }
               </div>
             </div>
           </div>

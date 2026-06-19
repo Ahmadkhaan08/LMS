@@ -16,6 +16,8 @@
     "@mui/x-data-grid": "^9.5.0",
     "@recharts/devtools": "^0.0.14",
     "@reduxjs/toolkit": "^2.12.0",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.8.0",
     "axios": "^1.17.0",
     "formik": "^2.4.9",
     "framer-motion": "^12.40.0",
