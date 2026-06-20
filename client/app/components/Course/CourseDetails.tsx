@@ -10,6 +10,7 @@ import CourseContentList from "./CourseContentList";
 import { useState } from "react";
 import { Elements } from '@stripe/react-stripe-js'
 import CheckOutForm from "../Payment/CheckOutForm";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 type Props = {
   data: any;
@@ -18,7 +19,9 @@ type Props = {
 };
 
 function CourseDetails({ data,stripePromise,clientSecret }: Props) {
-  const { user } = useSelector((state: any) => state.auth);
+  // const { user } = useSelector((state: any) => state.auth);
+  const {data:userData}=useLoadUserQuery({})
+  const user=userData?.user
   const [open, setOpen] = useState(false);
   const discountPercentage =
     ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
@@ -222,8 +225,8 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
               {/* min-h-[500px] */}
               <div className="w-full flex justify-end">
                 <IoCloseOutline
-                  size={40}
-                  className="text-black cursor-pointer"
+                  size={35}
+                  className="text-black cursor-pointer hover:bg-slate-300 hover:rounded-full p-2"
                   onClick={() => setOpen(false)}
                 />
               </div>

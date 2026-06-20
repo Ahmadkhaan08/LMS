@@ -46,7 +46,7 @@ const CheckOutForm = ({ setOpen, data }: Props) => {
       toast.success("Payment Done Successfully!");
       setIsLoading(false);
       setOpen(false)
-      createOrder({ courseId: data._id, payment_Info: paymentIntent });
+      await createOrder({ courseId: data._id, payment_Info: paymentIntent });
     }
   };
 

@@ -1,0 +1,234 @@
+import { styles } from "@/app/styles/style";
+import CoursePlayer from "@/app/utilis/CoursePlayer";
+import Image from "next/image";
+import React, { useState } from "react";
+import {
+  AiFillStar,
+  AiOutlineArrowLeft,
+  AiOutlineArrowRight,
+  AiOutlineStar,
+} from "react-icons/ai";
+
+type Props = {
+  data: any;
+  id: string;
+  activeVideo: number;
+  setActiveVideo: (activeVideo: number) => void;
+  user: any;
+};
+
+const CourseContentMedia = ({
+  data,
+  id,
+  activeVideo,
+  setActiveVideo,
+  user,
+}: Props) => {
+  const [activeBar, setActiveBar] = useState(0);
+  const [question, setQuestion] = useState("");
+  const [rating, setRating] = useState(1);
+  const [review, setReview] = useState("");
+  const isReviewsExist = false;
+  return (
+    <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
+      <CoursePlayer
+        title={data[activeVideo]?.title}
+        videoUrl={data[activeVideo]?.videoUrl}
+      />
+      <div className="w-full flex items-center justify-between my-3">
+        <div
+          className={`${
+            styles.button
+          } text-white  !w-[unset] !min-h-[40px] !py-[unset] ${
+            activeVideo === 0 && "!cursor-no-drop bg-gray-700! opacity-[.8]"
+          }`}
+          onClick={() =>
+            setActiveVideo(activeVideo === 0 ? 0 : activeVideo - 1)
+          }
+        >
+          <AiOutlineArrowLeft className="mr-2" />
+          Prev Lesson
+        </div>
+        <div
+          className={`${
+            styles.button
+          } !w-[unset] text-white  !min-h-[40px] !py-[unset] ${
+            data.length - 1 === activeVideo &&
+            "!cursor-no-drop  bg-gray-700! opacity-[.8]"
+          }`}
+          onClick={() =>
+            setActiveVideo(
+              data && data.length - 1 === activeVideo
+                ? activeVideo
+                : activeVideo + 1,
+            )
+          }
+        >
+          Next Lesson
+          <AiOutlineArrowRight className="ml-2" />
+        </div>
+      </div>
+      <h1
+        className="pt-2 text-[25px] font-Poppins
+       font-[600] dark:text-white text-black "
+      >
+        {data[activeVideo].title}
+      </h1>
+      <br />
+      {/* Tab Navigation */}
+      <div
+        className="w-full p-4 flex items-center justify-between bg-slate-200 bg-opacity-20  dark:bg-slate-900 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015]  rounded-lg  shadow-sm dark:shadow-inner
+          "
+      >
+        {["Overview", "Resources", "Q&A", "Reviews"].map(
+          (item: string, index: number) => (
+            <h5
+              key={index}
+              className={`800px:text-[20px] cursor-pointer font-Poppins  ${
+                activeBar === index
+                  ? "bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-600 dark:to-purple-600 p-3 rounded-full"
+                  : "dark:text-white text-black"
+              }`}
+              onClick={() => setActiveBar(index)}
+            >
+              {item}
+            </h5>
+          ),
+        )}
+      </div>
+      <br />
+      {/* Overview */}
+      {activeBar === 0 && (
+        <p className="text-[18px] whitespace-pre-line font-Poppins break-words mb-3 dark:text-white text-black">
+          {data[activeVideo]?.description}
+        </p>
+      )}
+      {/* Resources Links */}
+      {activeBar === 1 && (
+        <div>
+          {data[activeVideo]?.links.map((item: any, index: number) => (
+            <div className="mb-5 font-Poppins" key={index}>
+              <h2 className="800px:text-[20px] 800px:inline-block dark:text-white text-black">
+                {item.title && item.title + " :"}
+              </h2>
+              <a
+                className="inline-block text-[#4395c4] 800px:text-[20px] 800px:pl-2"
+                href={item.url}
+              >
+                {item.url}
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Q&A */}
+      {activeBar === 2 && (
+        <>
+          <div className="w-full flex">
+            <Image
+              src={`${
+                user.avatar
+                  ? user.avatar.url
+                  : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
+              }`}
+              alt=""
+              height={50}
+              width={50}
+              className="w-[50x] h-[50px] rounded-full object-cover"
+            />
+            <textarea
+              name=""
+              id=""
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              className="outline-none font-Poppins bg-transparent ml-3 border dark:text-white text-black border-[#0000001d] dark:border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins"
+              cols={4}
+              rows={6}
+              placeholder="Write Your Question..."
+            ></textarea>
+          </div>
+          <div className="w-full flex justify-end">
+            <div
+              className={`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 
+                          `}
+            >
+              Submit
+            </div>
+          </div>
+          <br />
+          <br />
+        </>
+      )}
+      {/* Review Submission  */}
+      {activeBar === 3 && (
+        <div className="w-full">
+          <>
+            {!isReviewsExist && (
+              <>
+                <div className="w-full flex">
+                  <Image
+                    src={`${
+                      user.avatar
+                        ? user.avatar.url
+                        : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
+                    }`}
+                    alt=""
+                    height={50}
+                    width={50}
+                    className="w-[50x] h-[50px] rounded-full"
+                  />
+                  <div className="w-full ">
+                    <h5 className="pl-3 font-Poppins text-[20px] font-[500] dark:text-white text-black ">
+                      Give a Rating <span className="text-red-500">*</span>
+                    </h5>
+                    <div className="flex w-full ml-2 pb-3">
+                      {[1, 2, 3, 4, 5].map((i) =>
+                        rating >= i ? (
+                          <AiFillStar
+                            key={i}
+                            className="mr-1 cursor-pointer"
+                            color="rgb(246,186,0)"
+                            size={25}
+                            onClick={() => setRating(i)}
+                          />
+                        ) : (
+                          <AiOutlineStar
+                            key={i}
+                            className="mr-1 cursor-pointer"
+                            color="rgb(246,186,0)"
+                            size={25}
+                            onClick={() => setRating(i)}
+                          />
+                        ),
+                      )}
+                    </div>
+                    <textarea
+                      name=""
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      id=""
+                      cols={20}
+                      rows={5}
+                      placeholder="Write your comment..."
+                      className="outline-none bg-transparent 800px:ml-3 font-Poppins dark:text-white text-black border border-[#00000027] dark:border-[#ffffff57] w-[95%] 800px:w-full p-2 rounded text-[18px] font-Poppins"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div className="w-full flex justify-end">
+                  <div
+                    className={`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2`}
+                  >
+                    Submit
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CourseContentMedia;
