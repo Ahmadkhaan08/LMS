@@ -1,8 +1,8 @@
 "use client";
-import { useGetCourseContentQuery } from "@/redux/features/courses/coursesApi";
+import { useGetCourseContentQuery } from "../../../redux/features/courses/coursesApi";
 import React, { useState } from "react";
 import Loader from "../Loader/Loader";
-import Heading from "@/app/utilis/Heading";
+import Heading from "../../utilis/Heading";
 import CourseContentMedia from "./CourseContentMedia";
 import Header from "../Header";
 import CourseContentList from "./CourseContentList";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const CourseContent = ({ id,user }: Props) => {
-  const { isLoading, data: contentData } = useGetCourseContentQuery(id);
+  const { isLoading, data: contentData ,refetch} = useGetCourseContentQuery(id,{refetchOnMountOrArgChange:true});
   const [activeVideo, setActiveVideo] = useState(0);
   const [open, setOpen] = useState(false);
   const [route, setRoute] = useState("Login");
@@ -47,6 +47,7 @@ const CourseContent = ({ id,user }: Props) => {
                 activeVideo={activeVideo}
                 setActiveVideo={setActiveVideo}
                 user={user}
+                refetch={refetch}
               />
             </div>
             <div className="hidden 800px:block 800px:col-span-3">
