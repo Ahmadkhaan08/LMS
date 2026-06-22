@@ -61,7 +61,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
   };
   return (
     <>
-      <div className="w-full flex justify-center">
+      <div className="w-full flex justify-center ">
         <div className="relative">
           <Image
             src={
@@ -90,7 +90,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
       <br />
       <br />
 
-      <div className="w-full pl-6 800px:pl-10">
+      <div className="w-full pl-6 800px:pl-10 font-Poppins">
         <form onSubmit={handleSubmit}>
           <div className="800px:w-[50%] m-auto block pb-4">
             <div className="w-[100%] dark:text-white text-black pt-2">

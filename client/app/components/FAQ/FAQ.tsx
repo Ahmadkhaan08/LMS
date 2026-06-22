@@ -27,7 +27,7 @@ const Faq = (props: Props) => {
     <>
       <div className={`${styles.label}`}>
         <div className="w-[90%] 800px:w-[80%] m-auto mt-30!">
-          <h1 className={`${styles.title} 800px:text-[40px]`}>
+          <h1 className={`font-[500] text-center text-[25px] font-Poppins bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-purple-600 800px:text-[40px]`}>
             Frequently Ask Questions
           </h1>
           <div className="mt-12">

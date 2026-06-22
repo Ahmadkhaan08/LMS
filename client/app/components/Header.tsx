@@ -125,13 +125,12 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
                       }`}
                       width={100}
                       height={100}
-                      // style={{border:activeItem===5?"2px solid blue":""}}
                     />
                   </Link>
                 ) : (
                   <Link href={"/profile"}>
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-black dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-semibold cursor-pointer">
-                      {userData.name?.charAt(0).toUpperCase()}
+                      {userData.user.name?.charAt(0).toUpperCase()}
                     </div>
                   </Link>
                 )
@@ -151,13 +150,35 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
             id="screen"
             onClick={handleClose}
           >
-            <div className="w-[70%] fixed z-999999999 h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 ">
+            <div className="w-[70%] fixed z-999999999 h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 font-Poppins">
               <NavItems activeItem={activeItem} isMobile={true} />
-              <HiOutlineUserCircle
-                size={25}
-                className="cursor-pointer dark:text-white ml-9 my-2 text-black"
-                onClick={() => setOpen(true)}
-              />
+               {userData ? (
+                userData.user.avatar ? (
+                  <Link href={"/profile"}>
+                    <Image
+                      src={userData.user.avatar.url}
+                      alt=""
+                      className={`w-7.5 h-7.5 rounded-full ml-[30px] ${
+                        activeItem === 5 ? "border-2 border-blue-500" : "none"
+                      }`}
+                      width={100}
+                      height={100}
+                    />
+                  </Link>
+                ) : (
+                  <Link href={"/profile"}>
+                    <div className="flex h-10 w-10 ml-[30px] items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-black dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-semibold cursor-pointer">
+                      {userData.user.name?.charAt(0).toUpperCase()}
+                    </div>
+                  </Link>
+                )
+              ) : (
+                <HiOutlineUserCircle
+                  size={25}
+                  className="cursor-pointer dark:text-white ml-9 my-2 text-black"
+                  onClick={() => setOpen(true)}
+                />
+              )}
               <br />
               <br />
               <p className="text-[16px] px-2 pl-5 text-black dark:text-white">

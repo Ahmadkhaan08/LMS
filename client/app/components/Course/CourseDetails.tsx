@@ -169,7 +169,7 @@ function CourseDetails({
                         className="w-[50px] h-[50px] rounded-full object-cover"
                       />
                     </div>
-                    <div className="hidden 800px:block pl-2 font-Poppins">
+                    <div className="block pl-2 font-Poppins">
                       <div className="flex items-center">
                         <h5 className="text-[18px] pr-2 text-black dark:text-white">
                           {item.user.name}
