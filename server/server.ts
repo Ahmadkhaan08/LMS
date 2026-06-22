@@ -2,7 +2,10 @@ import {app} from "./app"
 import dotenv from "dotenv"
 import {v2 as cloudinary} from "cloudinary"
 import { connnectDB } from "./utilis/db"
+import http from "http"
+import { initSocketServer } from "./socketServer"
 dotenv.config()
+const server=http.createServer(app)
 
 // cloudinary configuration
 const cloudName = process.env.CLOUD_NAME
@@ -21,7 +24,9 @@ cloudinary.config({
 
 
 // SERVER RUNNING
-app.listen(process.env.PORT,()=>{
+initSocketServer(server)
+
+server.listen(process.env.PORT,()=>{
     console.log(`Server is running on port ${process.env.PORT}`)
     connnectDB()
 })

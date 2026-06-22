@@ -9,9 +9,12 @@ import { SessionProvider } from "next-auth/react";
 import {
   useLoadUserQuery,
   useRefreshTokenQuery,
-} from "@/redux/features/api/apiSlice";
+} from "../redux/features/api/apiSlice";
 import Loader from "./components/Loader/Loader";
-import { FC, useState } from "react";
+import { FC, useEffect } from "react";
+import socketIO from "socket.io-client"
+const ENDPOINT=process.env.NEXT_PUBLIC_SOCKET_SERVER_URL||""
+const socketId=socketIO(ENDPOINT,{transports:["websocket"]})
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -53,5 +56,9 @@ const Custom: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading: refreshLoading } = useRefreshTokenQuery({});
   // Step 2: Only load user AFTER refresh completes (skip while refreshing)
   const { isLoading } = useLoadUserQuery({}, { skip: refreshLoading });
+
+  useEffect(()=>{
+    socketId.on("connection",()=>{})
+  },[])
   return <>{refreshLoading || isLoading ? <Loader /> : <>{children}</>}</>;
 };

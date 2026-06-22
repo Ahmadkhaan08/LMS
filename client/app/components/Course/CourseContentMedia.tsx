@@ -20,6 +20,9 @@ import { BiMessage } from "react-icons/bi";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { format } from "timeago.js";
 import Ratings from "../../utilis/Ratings";
+import socketIO from "socket.io-client"
+const ENDPOINT=process.env.NEXT_PUBLIC_SOCKET_SERVER_URL||""
+const socketId=socketIO(ENDPOINT,{transports:["websocket"]})
 
 type Props = {
   data: any;
@@ -116,6 +119,11 @@ const CourseContentMedia = ({
       setQuestion("");
       refetch();
       toast.success("Questiton Added SuccessFully!");
+      socketId.emit("notification",{
+        title:"New Question Recieved",
+        message:`You have a new question in ${data[activeVideo].title}`,
+        userId:user._id
+      })
     }
     if (error) {
       if ("data" in error) {
@@ -129,6 +137,13 @@ const CourseContentMedia = ({
       setAnswer("");
       refetch();
       toast.success("Answer Added Successfully!");
+      if(user.role==="admin"){
+         socketId.emit("notification",{
+        title:"New Question Reply Recieved",
+        message:`You have a new question reply in ${data[activeVideo].title}`,
+        userId:user._id
+      })
+      }
     }
     if (answerError) {
       if ("data" in answerError) {
@@ -143,6 +158,11 @@ const CourseContentMedia = ({
       setRating(1);
       courseRefetch();
       toast.success("Review Added SuccessFully!");
+       socketId.emit("notification",{
+        title:"New Review Received",
+        message:`${user.name} left a review for ${data[activeVideo].title}`,
+        userId:user._id
+      })
     }
     if (reviewError) {
       if ("data" in reviewError) {

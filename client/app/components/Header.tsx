@@ -8,14 +8,14 @@ import CustomModel from "../utilis/CustomModel";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
-import { useSelector } from "react-redux";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import {
   useLogoutQuery,
   useSocialAuthMutation,
-} from "@/redux/features/auth/authApi";
+} from "../../redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import { useLoadUserQuery } from "../../redux/features/api/apiSlice";
 
 type Props = {
   open: boolean;
@@ -35,7 +35,8 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
   };
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
-  const { user } = useSelector((state: any) => state.auth);
+  // const { user } = useSelector((state: any) => state.auth);
+  const {data:userData,isLoading,refetch}=useLoadUserQuery({})
   const { data, status } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const [logout, setLogout] = useState(false);
@@ -46,21 +47,28 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
   // console.log(data?.user?.image);
 
   useEffect(() => {
-    if (!user) {
+    if(!isLoading){
+      if (!userData) {
       if (status === "authenticated" && data) {
         socialAuth({
           email: data?.user?.email,
           name: data?.user?.name,
           avatar: data?.user?.image,
         });
+        refetch()
       }
+    }
     }
 
     if (data === null && isSuccess) {
       toast.success("Welcome back to ELearning!");
       setOpen(false);
     }
-  }, [data, user, status]);
+
+    if(data===null  && !isLoading && !userData){
+      setLogout(true)
+    }
+  }, [data, userData, status]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,7 +82,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  // console.log(user);
+  // console.log(userData);
 
   return (
     <div className="w-full relative">
@@ -106,11 +114,11 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
                   onClick={() => setOpenSidebar(true)}
                 />
               </div>
-              {user ? (
-                user.avatar ? (
+              {userData ? (
+                userData.user.avatar ? (
                   <Link href={"/profile"}>
                     <Image
-                      src={user.avatar.url}
+                      src={userData.user.avatar.url}
                       alt=""
                       className={`w-7.5 h-7.5 rounded-full ${
                         activeItem === 5 ? "border-2 border-blue-500" : "none"
@@ -123,7 +131,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
                 ) : (
                   <Link href={"/profile"}>
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-black dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-semibold cursor-pointer">
-                      {user.name?.charAt(0).toUpperCase()}
+                      {userData.name?.charAt(0).toUpperCase()}
                     </div>
                   </Link>
                 )
@@ -168,6 +176,7 @@ const Header: FC<Props> = ({ open, activeItem, setOpen, route, setRoute }) => {
               setRoute={setRoute}
               activeItem={activeItem}
               component={Login}
+              refetch={refetch}
             />
           )}
         </>
