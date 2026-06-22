@@ -62,11 +62,15 @@ const CourseDetailsPage = ({ id }: Props) => {
             route={active}
             setRoute={setActive}
           />
-          {
-            stripePromise && (
-              <CourseDetails data={data.course}  stripePromise={stripePromise} clientSecret={clientSecret}/>
-            )
-          }
+          {stripePromise && (
+            <CourseDetails
+              data={data.course}
+              stripePromise={stripePromise}
+              clientSecret={clientSecret}
+              setOpen={setOpen}
+              setRoute={setActive}
+            />
+          )}
           <Footer />
         </div>
       )}

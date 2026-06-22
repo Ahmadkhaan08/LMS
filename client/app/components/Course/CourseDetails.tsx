@@ -6,23 +6,32 @@ import Link from "next/link";
 import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckOutForm from "../Payment/CheckOutForm";
 import { useLoadUserQuery } from "../../../redux/features/api/apiSlice";
 import Image from "next/image";
 import { VscVerifiedFilled } from "react-icons/vsc";
+import toast from "react-hot-toast";
 
 type Props = {
   data: any;
   stripePromise: any;
   clientSecret: string;
+  setOpen: any;
+  setRoute: any;
 };
 
-function CourseDetails({ data, stripePromise, clientSecret }: Props) {
-  // const { user } = useSelector((state: any) => state.auth);
+function CourseDetails({
+  data,
+  stripePromise,
+  clientSecret,
+  setOpen: openAuthModel,
+  setRoute,
+}: Props) {
   const { data: userData } = useLoadUserQuery({});
-  const user = userData?.user;
+  const [user, setUser] = useState<any>();
+  // const user = userData?.user;
   const [open, setOpen] = useState(false);
   const discountPercentage =
     ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
@@ -32,8 +41,19 @@ function CourseDetails({ data, stripePromise, clientSecret }: Props) {
   // console.log(user);
   // console.log(data);
 
+  useEffect(() => {
+    setUser(userData?.user);
+  }, [userData]);
+
+  
   const handleOrder = () => {
-    setOpen(true);
+    if (user) {
+      setOpen(true);
+    } else {
+      setRoute("Login");
+      openAuthModel(true);
+      toast.error("Please login to access this resource!");
+    }
   };
   return (
     <div className="w-[90%] 800px:w-[90%] m-auto py-5">
@@ -60,7 +80,7 @@ function CourseDetails({ data, stripePromise, clientSecret }: Props) {
           <h1 className="text-[25px] font-Poppins font-semibold text-black dark:text-white">
             What you will learn from this course?
           </h1>
-          <div >
+          <div>
             {data.benefits?.map((item: any, index: number) => (
               <div className="w-full flex 800px:items-center py-2" key={index}>
                 <div className="w-3.75 mr-1">
