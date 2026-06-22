@@ -3,6 +3,9 @@ import CoursePlayer from "../../utilis/CoursePlayer";
 import {
   useAddAnswerToQuestionMutation,
   useAddNewQuestionMutation,
+  useAddReplyInReviewMutation,
+  useAddReviewInCourseMutation,
+  useGetCourseDetailsQuery,
 } from "../../../redux/features/courses/coursesApi";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -16,6 +19,7 @@ import {
 import { BiMessage } from "react-icons/bi";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { format } from "timeago.js";
+import Ratings from "../../utilis/Ratings";
 
 type Props = {
   data: any;
@@ -40,22 +44,25 @@ const CourseContentMedia = ({
   const [review, setReview] = useState("");
   const [answer, setAnswer] = useState("");
   const [questionId, setQuestionId] = useState("");
+  const [isReviewReply, setIsReviewReply] = useState(false);
+  const [reply, setReply] = useState("");
+  const [reviewId, setReviewId] = useState("");
 
-  const [
-    addNewQuestion,
-    { isSuccess: questionSuccess, error, isLoading: questionCreationLoading },
-  ] = useAddNewQuestionMutation();
+  const [addNewQuestion,{ isSuccess: questionSuccess, error, isLoading: questionCreationLoading }] = useAddNewQuestionMutation();
 
-  const [
-    addAnswerToQuestion,
-    {
-      isSuccess: answerSuccess,
-      error: answerError,
-      isLoading: answerCreationLoading,
-    },
-  ] = useAddAnswerToQuestionMutation();
+  const [addAnswerToQuestion,{isSuccess: answerSuccess,error: answerError,isLoading: answerCreationLoading}] = useAddAnswerToQuestionMutation();
 
-  const isReviewsExist = data?.reviews?.find(
+  const [addReviewInCourse,{isLoading: reviewCreationLoading,isSuccess: reviewSuccess,error: reviewError,},] = useAddReviewInCourseMutation({});
+
+  const { data: courseData, refetch: courseRefetch } = useGetCourseDetailsQuery(id,{ refetchOnMountOrArgChange: true });
+
+  const [addReplyInReview,{isSuccess: replySuccess,isLoading: replyCreationLoading,error: replyError}] = useAddReplyInReviewMutation({});
+
+  const course = courseData?.course;
+
+  // console.log(course);
+
+  const isReviewsExist = course?.reviews?.find(
     (item: any) => item.user._id === user._id,
   );
 
@@ -71,15 +78,37 @@ const CourseContentMedia = ({
     }
   };
 
-   const handleAnswerSubmit = () => {
-        addAnswerToQuestion({
-            answer,
-            courseId: id,
-            contentId: data[activeVideo]._id,
-            questionId: questionId,
-        });
-    };
+  const handleAnswerSubmit = () => {
+    addAnswerToQuestion({
+      answer,
+      courseId: id,
+      contentId: data[activeVideo]._id,
+      questionId: questionId,
+    });
+  };
 
+  const handleReviewSubmit = () => {
+    if (review.length == 0) {
+      toast.error("Review Can`t be Empty!");
+    } else {
+      addReviewInCourse({
+        rating,
+        review,
+        courseId: id,
+        contentId: data[activeVideo]._id,
+      });
+    }
+  };
+
+  const handleReviewReplySubmit = () => {
+    if (!replyCreationLoading) {
+      if (reply === "") {
+        toast.error("Reply can`t be empty!");
+      } else {
+        addReplyInReview({ comment: reply, courseId: id, reviewId });
+      }
+    }
+  };
 
   useEffect(() => {
     //Question Response
@@ -95,19 +124,55 @@ const CourseContentMedia = ({
       }
     }
 
-     // Answer Response
-        if (answerSuccess) {
-            setAnswer("");
-            refetch();
-            toast.success("Answer Added Successfully!");
-        }
-        if (answerError) {
-            if ("data" in answerError) {
-                const errorMessage = answerError as any;
-                toast.error(errorMessage.data.message);
-            }
-        }
-  }, [questionSuccess, error,answerSuccess,answerError]);
+    // Answer Response
+    if (answerSuccess) {
+      setAnswer("");
+      refetch();
+      toast.success("Answer Added Successfully!");
+    }
+    if (answerError) {
+      if ("data" in answerError) {
+        const errorMessage = answerError as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+
+    // Review Response
+    if (reviewSuccess) {
+      setReview("");
+      setRating(1);
+      courseRefetch();
+      toast.success("Review Added SuccessFully!");
+    }
+    if (reviewError) {
+      if ("data" in reviewError) {
+        const errorMessage = reviewError as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+
+    // Review Reply Response
+    if (replySuccess) {
+      setReply("");
+      courseRefetch();
+      toast.success("Reply Added SuccessFully!");
+    }
+    if (replyError) {
+      if ("data" in replyError) {
+        const errorMessage = replyError as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+  }, [
+    questionSuccess,
+    error,
+    answerSuccess,
+    answerError,
+    reviewSuccess,
+    reviewError,
+    replySuccess,
+    replyError,
+  ]);
   return (
     <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
       <CoursePlayer
@@ -118,7 +183,7 @@ const CourseContentMedia = ({
         <div
           className={`${
             styles.button
-          } text-white  !w-[unset] !min-h-[40px] !py-[unset] ${
+          } text-white  w-[unset]! !min-h-[40px] py-[unset]! ${
             activeVideo === 0 && "!cursor-no-drop bg-gray-700! opacity-[.8]"
           }`}
           onClick={() =>
@@ -131,7 +196,7 @@ const CourseContentMedia = ({
         <div
           className={`${
             styles.button
-          } !w-[unset] text-white  !min-h-[40px] !py-[unset] ${
+          } w-[unset]! text-white  !min-h-[40px] py-[unset]! ${
             data.length - 1 === activeVideo &&
             "!cursor-no-drop  bg-gray-700! opacity-[.8]"
           }`}
@@ -230,7 +295,7 @@ const CourseContentMedia = ({
             <div
               className={`${
                 styles.button
-              } !w-[120px] !h-[40px] text-[18px] mt-5 w-[unset]! ${
+              }  !h-[40px] text-[18px] mt-5 w-[unset]! ${
                 questionCreationLoading && `cursor-not-allowed`
               }
 
@@ -318,13 +383,125 @@ const CourseContentMedia = ({
 
                 <div className="w-full flex justify-end">
                   <div
-                    className={`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2`}
+                    className={`${
+                      styles.button
+                    } w-[unset]! !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 ${
+                      reviewCreationLoading && "cursor-no-drop"
+                    }`}
+                    onClick={
+                      reviewCreationLoading ? () => {} : handleReviewSubmit
+                    }
                   >
-                    Submit
+                    {reviewCreationLoading ? "Submitting..." : "Submit"}
                   </div>
                 </div>
               </>
             )}
+            {/* Reviews */}
+            <br />
+            <div className="w-full h-[2px] bg-[#ffffff3b]"></div>
+            <div className="w-full font-Poppins">
+              {course?.reviews &&
+                [...course.reviews]
+                  .reverse()
+                  .map((item: any, index: number) => (
+                    <div
+                      className="w-full my-5 dark:text-white text-black"
+                      key={index}
+                    >
+                      <div className="w-full flex ">
+                        <div>
+                          <Image
+                            src={
+                              item.user.avatar
+                                ? item.user.avatar.url
+                                : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
+                            }
+                            width={50}
+                            height={50}
+                            alt=""
+                            className="w-[50px] h-[50px] rounded-full object-cover"
+                          />
+                        </div>
+                        <div className="ml-2 ">
+                          <h1 className="text-[18px]">{item?.user.name}</h1>
+                          <Ratings rating={item.rating} />
+                          <p>{item.comment}</p>
+                          <small className="text-[#0000009e] dark:text-[#ffffff83]   ">
+                            {format(item.createdAt)} •
+                          </small>
+                        </div>
+                      </div>
+                      {user.role === "admin" &&
+                        item.commentReplies?.length === 0 && (
+                          <span
+                            className={`${styles.label} !ml-10 cursor-pointer`}
+                            onClick={() => {
+                              setIsReviewReply(true);
+                              setReviewId(item._id);
+                            }}
+                          >
+                            Add Reply
+                          </span>
+                        )}
+                      {/* Review Reply */}
+                      {isReviewReply && reviewId === item._id && (
+                        <div className="w-full flex relative">
+                          <input
+                            type="text"
+                            placeholder="Enter your reply..."
+                            value={reply}
+                            onChange={(e: any) => setReply(e.target.value)}
+                            className="block 800px:ml-12 mt-2 outline-none bg-transparent border-b border-[#000] dark:border-[#fff] p-[5px] w-[95%]"
+                          />
+                          <button
+                            type="submit"
+                            className="absolute right-0 bottom-1 cursor-pointer"
+                            disabled={replyCreationLoading}
+                            onClick={
+                              replyCreationLoading
+                                ? () => {}
+                                : handleReviewReplySubmit
+                            }
+                          >
+                            {replyCreationLoading ? "Submitting..." : "Submit"}
+                          </button>
+                        </div>
+                      )}
+                      {/* Comment Replies */}
+                      {item.commentReplies?.map((i: any, index: number) => (
+                        <div
+                          className="w-full flex 800px:ml-16 my-5"
+                          key={index}
+                        >
+                          <div className="w-[50px] h-[50px]">
+                            <Image
+                              src={
+                                i.user.avatar
+                                  ? i.user.avatar.url
+                                  : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
+                              }
+                              width={50}
+                              height={50}
+                              alt=""
+                              className="w-[50px] h-[50px] rounded-full object-cover"
+                            />
+                          </div>
+                          <div className="pl-2">
+                            <div className="flex items-center">
+                              <h5 className="text-[20px]">{i.user.name}</h5>
+                              <VscVerifiedFilled className="text-[#0095F6] ml-2 text-[20px]" />
+                            </div>
+                            <p>{i.comment}</p>
+                            <small className="text-[#ffffff83]">
+                              {format(i.createdAt)} •
+                            </small>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+            </div>
           </>
         </div>
       )}
@@ -392,7 +569,7 @@ const CommentItem = ({
             className="w-[50px] h-[50px] rounded-full object-cover"
           />
         </div>
-        <div className="pl-3 dark:text-[#fff] text-black">
+        <div className="pl-3 dark:text-[#fff] text-black font-Poppins">
           <h5 className="text-[20px]">{item?.user?.name}</h5>
           <p>{item?.question}</p>
           <small className=" text-[#000000b8] dark:text-[#ffffff83]">
@@ -400,7 +577,7 @@ const CommentItem = ({
           </small>
         </div>
       </div>
-      <div className="w-full flex ">
+      <div className="w-full flex font-Poppins">
         <span
           className="800px:pl-16 text-[#000000b8] dark:text-[#ffffff83] cursor-pointer mr-2"
           onClick={() => {
@@ -442,7 +619,7 @@ const CommentItem = ({
                   className="w-[50px] h-[50px] rounded-full object-cover"
                 />
               </div>
-              <div className="pl-2 ">
+              <div className="pl-2 font-Poppins">
                 <div className="flex items-center">
                   <h5 className="text-[20px]">{item.user.name}</h5>
                   {item.user.role === "admin" && (
@@ -470,7 +647,7 @@ const CommentItem = ({
               />
               <button
                 type="submit"
-                className="absolute right-0 bottom-1"
+                className="absolute right-0 bottom-1 font-Poppins"
                 onClick={handleAnswerSubmit}
                 disabled={answer === "" || answerCreationLoading}
               >

@@ -4,24 +4,25 @@ import CoursePlayer from "../../utilis/CoursePlayer";
 import Ratings from "../../utilis/Ratings";
 import Link from "next/link";
 import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
-import { useSelector } from "react-redux";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
 import { useState } from "react";
-import { Elements } from '@stripe/react-stripe-js'
+import { Elements } from "@stripe/react-stripe-js";
 import CheckOutForm from "../Payment/CheckOutForm";
-import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import { useLoadUserQuery } from "../../../redux/features/api/apiSlice";
+import Image from "next/image";
+import { VscVerifiedFilled } from "react-icons/vsc";
 
 type Props = {
   data: any;
-  stripePromise:any,
-  clientSecret:string
+  stripePromise: any;
+  clientSecret: string;
 };
 
-function CourseDetails({ data,stripePromise,clientSecret }: Props) {
+function CourseDetails({ data, stripePromise, clientSecret }: Props) {
   // const { user } = useSelector((state: any) => state.auth);
-  const {data:userData}=useLoadUserQuery({})
-  const user=userData?.user
+  const { data: userData } = useLoadUserQuery({});
+  const user = userData?.user;
   const [open, setOpen] = useState(false);
   const discountPercentage =
     ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
@@ -59,7 +60,7 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
           <h1 className="text-[25px] font-Poppins font-semibold text-black dark:text-white">
             What you will learn from this course?
           </h1>
-          <div>
+          <div >
             {data.benefits?.map((item: any, index: number) => (
               <div className="w-full flex 800px:items-center py-2" key={index}>
                 <div className="w-3.75 mr-1">
@@ -148,7 +149,7 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
                         className="w-[50px] h-[50px] rounded-full object-cover"
                       />
                     </div>
-                    <div className="hidden 800px:block pl-2">
+                    <div className="hidden 800px:block pl-2 font-Poppins">
                       <div className="flex items-center">
                         <h5 className="text-[18px] pr-2 text-black dark:text-white">
                           {item.user.name}
@@ -163,6 +164,34 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
                       </small>
                     </div>
                   </div>
+                  {/* Comment Replies */}
+                  {item.commentReplies.map((i: any, index: number) => (
+                    <div className="w-full flex 800px:ml-16 my-5" key={index}>
+                      <div className="w-[50px] h-[50px]">
+                        <Image
+                          src={
+                            i.user.avatar
+                              ? i.user.avatar.url
+                              : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
+                          }
+                          width={50}
+                          height={50}
+                          alt=""
+                          className="w-[50px] h-[50px] rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="pl-2  font-Poppins">
+                        <div className="flex items-center">
+                          <h5 className="text-[20px]">{i.user.name}</h5>
+                          <VscVerifiedFilled className="text-[#0095F6] ml-2 text-[20px]" />
+                        </div>
+                        <p>{i.comment}</p>
+                        <small className="text-[#ffffff83]">
+                          {format(i.createdAt)} •
+                        </small>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
           </div>
@@ -221,7 +250,7 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
       <>
         {open && (
           <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center">
-            <div className="w-[500px] max-h-[90vh] overflow-y-auto  bg-white rounded-xl shadow p-3"> 
+            <div className="w-[500px] max-h-[90vh] overflow-y-auto  bg-white rounded-xl shadow p-3">
               {/* min-h-[500px] */}
               <div className="w-full flex justify-end">
                 <IoCloseOutline
@@ -231,14 +260,11 @@ function CourseDetails({ data,stripePromise,clientSecret }: Props) {
                 />
               </div>
               <div className="w-full">
-                {
-                  stripePromise && clientSecret && (
-                    <Elements stripe={stripePromise} options={{clientSecret}} >
-                      <CheckOutForm setOpen={setOpen} data={data}/>
-                    </Elements>
-
-                  )
-                }
+                {stripePromise && clientSecret && (
+                  <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    <CheckOutForm setOpen={setOpen} data={data} />
+                  </Elements>
+                )}
               </div>
             </div>
           </div>

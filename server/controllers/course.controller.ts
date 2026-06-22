@@ -313,6 +313,8 @@ export const addAnswer = CatchAsyncHandler(
       const newAnswer: any = {
         user: req.user,
         answer,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       // add this answer to our course content
@@ -383,9 +385,19 @@ export const addReview = CatchAsyncHandler(
 
       const courseId = req.params.id;
 
+      const userId = req.user?._id;
+
+      if (!userId) {
+        return next(new ErrorHandler("User ID is required", 400));
+      }
+
+      if (!courseId) {
+        return next(new ErrorHandler("Course ID is required", 400));
+      }
+
       // check if course Id exists in user course list based on _id
       const courseExists = userCourseList?.some(
-        (course: any) => course._id.toString() === courseId?.toString(),
+        (course: any) => course.courseId.toString() === courseId?.toString(),
       );
 
       if (!courseExists) {
@@ -418,12 +430,14 @@ export const addReview = CatchAsyncHandler(
 
       await course?.save();
 
-      const notification = {
+      await redis.set(courseId.toString(),JSON.stringify(course), "EX",604800) //7 days
+
+      // send notification to admin
+      await notificationModel.create({
+        userId: userId.toString(),
         title: "New Review Received",
         message: `${req.user?.name} left a review for ${course?.name}`,
-      };
-
-      // create a notification
+      });
 
       res.status(200).json({
         success: true,
@@ -464,6 +478,8 @@ export const addReplyToReview = CatchAsyncHandler(
       const replyData: any = {
         user: req.user,
         comment,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       if (!review.commentReplies) {
@@ -472,6 +488,8 @@ export const addReplyToReview = CatchAsyncHandler(
       review.commentReplies.push(replyData);
 
       await course.save();
+
+      await redis.set(courseId.toString(),JSON.stringify(course), "EX",604800) //7 days
 
       res.status(200).json({
         success: true,
