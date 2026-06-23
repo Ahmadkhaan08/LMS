@@ -1,10 +1,13 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "commonjs",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "build": "tsc && cp -r mails dist/",
+    "start": "node dist/server.js"
   },
   "author": "Ahmad Khan",
   "license": "ISC",
