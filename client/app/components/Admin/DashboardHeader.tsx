@@ -12,8 +12,8 @@ const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  open?: boolean;
+  setOpen?: any;
 };
 
 const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
